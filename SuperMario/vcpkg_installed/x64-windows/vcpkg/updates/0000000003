@@ -1,0 +1,6 @@
+Package: vcpkg-cmake
+Version: 2022-12-22
+Architecture: x64-windows
+Multi-Arch: same
+Abi: fb30e391411140ffcea393e1ae588e3a2c2bcb0d0cc264936490a0372598419c
+Status: install ok installed
