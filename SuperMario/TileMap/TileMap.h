@@ -19,6 +19,7 @@ public:
 
 private:
 	void GenerateTileMap(UINT width, UINT height, UINT spacing);
+	void RegenerateTileMap();
 	Tile* GetTile(const Vector2& unprojectedMousePos);
 
 	void SaveTileMap(const wstring& path = L"");
@@ -36,5 +37,10 @@ private:
 
 	ComPtr<ID3D11ShaderResourceView> srv;
 
+	ComPtr<ID3D11BlendState> blendState;
+
 	unique_ptr<class TileSet> tileSet;
+
+	bool bCollision = false;
+	bool bView = false;
 };

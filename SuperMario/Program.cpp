@@ -9,8 +9,9 @@ Program::Program()
 void Program::Init()
 {
 	sceneList.push_back(make_shared<Scene10>());
+	sceneList.push_back(make_shared<Test>());
 
-	currentScene = sceneList[0];
+	currentScene = sceneList[1];
 	currentScene->Init();
 }
 

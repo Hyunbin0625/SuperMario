@@ -19,7 +19,7 @@ TileSet::TileSet(const wstring& texturePath, UINT tileXCount, UINT tileYCount)
 void TileSet::GUI()
 {
 	static bool bOpen = true;
-	if (ImGui::Begin("TileSprite", &bOpen))
+	if (ImGui::BeginTabItem("TileSprite"))
 	{
 		int index = 0;
 
@@ -40,6 +40,7 @@ void TileSet::GUI()
 					ImGui::SameLine();
 			}
 		}
+
+		ImGui::EndTabItem();
 	}
-	ImGui::End();
 }

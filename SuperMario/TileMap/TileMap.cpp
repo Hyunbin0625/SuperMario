@@ -33,6 +33,27 @@ TileMap::TileMap(const Vector2& position, const Vector2& scale, float rotation, 
 	IL->Create(VertexTexture::descs, VS->GetBlob());
 
 	srv = tileSet->srv;
+
+	// CreateBlendState
+	{
+		D3D11_BLEND_DESC desc;
+		desc.AlphaToCoverageEnable = false;
+		desc.IndependentBlendEnable = false;
+
+		desc.RenderTarget[0].BlendEnable = true;
+		desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+
+		desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+
+		desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		HRESULT hr = DEVICE->CreateBlendState(&desc, &blendState);
+		CHECK(hr);
+	}
 }
 
 void TileMap::Update()
@@ -85,9 +106,14 @@ void TileMap::Render()
 			DC->Unmap(VB->GetResource(), 0);
 
 			SetWorld(XMMatrixTranslationFromVector(position + tile.pos));
+
+			DC->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
+
 			WB->SetVSBuffer(0);
 
 			DC->DrawIndexed(IB->GetCount(), 0, 0);
+			
+			DC->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
 		}
 	}
 }
@@ -96,16 +122,31 @@ void TileMap::GUI()
 {
 	tileSet->GUI();
 
-	static bool bOpen = true;
-	if (ImGui::Begin("TileMap", &bOpen))
+	if (ImGui::BeginTabItem("Map Details"))
 	{
-		if (ImGui::Button("Save", ImVec2(50, 30)))
-			SaveTileMap();
+		if (ImGui::InputInt("Width", (int*)&width))
+			RegenerateTileMap();
+		if (ImGui::InputInt("Height", (int*)&height))
+			RegenerateTileMap();
+		if (ImGui::InputInt("Spacing", (int*)&spacing))
+			RegenerateTileMap();
 
-		if (ImGui::Button("Load", ImVec2(50, 30)))
-			LoadTileMap();
+		ImGui::Checkbox("bCollision", &bCollision);
+		ImGui::Checkbox("bView", &bView);
+
+		ImGui::EndTabItem();
 	}
-	ImGui::End();
+	
+	// 나중에 이동
+//	if (ImGui::Begin("TileMap", &bOpen))
+//	{
+//		if (ImGui::Button("Save", ImVec2(50, 30)))
+//			SaveTileMap();
+//
+//		if (ImGui::Button("Load", ImVec2(50, 30)))
+//			LoadTileMap();
+//	}
+//	ImGui::End();
 }
 
 void TileMap::GenerateTileMap(UINT width, UINT height, UINT spacing)
@@ -125,6 +166,44 @@ void TileMap::GenerateTileMap(UINT width, UINT height, UINT spacing)
 		for (UINT x = 0; x < width; ++x)
 			tiles[y][x].pos = Vector2((float)x, (float)y) * (float)spacing;
 	}
+}
+
+void TileMap::RegenerateTileMap()
+{
+	if (width == 0 || height == 0 || spacing == 0)
+	{
+		assert(false);
+		return;
+	}
+
+	tiles.resize(height, vector<Tile>());
+	for (UINT y = 0; y < height; ++y)
+	{
+		tiles[y].resize(width, Tile());
+
+		for (UINT x = 0; x < width; ++x)
+			tiles[y][x].pos = Vector2((float)x, (float)y) * (float)spacing;
+	}
+
+	vertices.assign(4, VertexTexture());
+
+	vertices[0].position = Vector2(0, 0);
+	vertices[1].position = Vector2(0, (float)spacing);
+	vertices[2].position = Vector2((float)spacing, 0);
+	vertices[3].position = Vector2((float)spacing, (float)spacing);
+
+	vertices[0].uv = Vector2(0, 1);
+	vertices[1].uv = Vector2(0, 0);
+	vertices[2].uv = Vector2(1, 1);
+	vertices[3].uv = Vector2(1, 0);
+
+	VB->Create(vertices, D3D11_USAGE_DYNAMIC);
+
+	indices = { 0, 1, 2, 2, 1, 3 };
+	IB = make_unique<IndexBuffer>();
+	IB->Create(indices, D3D11_USAGE_IMMUTABLE);
+
+	IL->Create(VertexTexture::descs, VS->GetBlob());
 }
 
 Tile* TileMap::GetTile(const Vector2& unprojectedMousePos)

@@ -19,7 +19,7 @@ float4 PS(PixelInput input) : SV_Target0    // target0번에 출력
     float border = 1.0f / 128;
     
     if (_bOutline && (input.uv.x < border || input.uv.x > 1.0f - border || input.uv.y < border || input.uv.y > 1.0f - border))
-        color = float4(1, 1, 1, 1);
+        color = float4(0, 1, 0, 1);
     
     return color;
 };

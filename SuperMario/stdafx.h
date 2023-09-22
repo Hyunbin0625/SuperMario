@@ -166,6 +166,9 @@ extern float gWinHeight;
 // TileMap
 #include "TileMap/TileMap.h"
 
+// Character
+#include "Character/Player.h"
+
 // GetComponentMacro
 #define GET_COMP(COMPONENT_NAME) GetComponent<COMPONENT_NAME##Component>(#COMPONENT_NAME)	// ## : 이어 붙인다. 매크로 치환, # : 문자열로 치환이 된다.
 
