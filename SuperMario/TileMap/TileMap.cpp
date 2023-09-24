@@ -54,6 +54,8 @@ TileMap::TileMap(const Vector2& position, const Vector2& scale, float rotation, 
 		HRESULT hr = DEVICE->CreateBlendState(&desc, &blendState);
 		CHECK(hr);
 	}
+
+	tileCollisions.reserve(10);
 }
 
 void TileMap::Update()
@@ -63,7 +65,7 @@ void TileMap::Update()
 	if (ImGui::IsAnyItemActive())
 		return;
 
-	if (INPUT->Press(VK_LBUTTON))
+	if (INPUT->Press(VK_LBUTTON) && INPUT->Press(VK_SPACE))
 	{
 		Tile* tile = GetTile(INPUT->GetMousePosition());
 
@@ -71,8 +73,14 @@ void TileMap::Update()
 		{
 			tile->uvStart = tileSet->selectedStartUV;
 			tile->uvEnd = tileSet->selectedStartUV + tileSet->texelTileSize;
+
+			if (bCollision)
+				tileCollisions.back()->Resize(*tile, spacing);
 		}
 	}
+
+	for (auto& tileCollision : tileCollisions)
+		tileCollision->Update();
 }
 
 void TileMap::Render()
@@ -83,6 +91,7 @@ void TileMap::Render()
 	DC->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	DC->PSSetShaderResources(0, 1, srv.GetAddressOf());
+	DC->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
 
 	for (UINT y = 0; y < height; ++y)
 	{
@@ -107,29 +116,42 @@ void TileMap::Render()
 
 			SetWorld(XMMatrixTranslationFromVector(position + tile.pos));
 
-			DC->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
-
 			WB->SetVSBuffer(0);
 
 			DC->DrawIndexed(IB->GetCount(), 0, 0);
-			
-			DC->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
 		}
 	}
+
+	if (bView)
+	{
+		for (auto& tileCollision : tileCollisions)
+			tileCollision->Render();
+	}
+
+	DC->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
 }
 
 void TileMap::GUI()
 {
 	tileSet->GUI();
 
-	if (ImGui::BeginTabItem("Map Details"))
+	if (ImGui::BeginTabItem("MapDetails"))
 	{
 		if (ImGui::InputInt("Width", (int*)&width))
+		{
 			RegenerateTileMap();
+			RegenerateTileCollision();
+		}
 		if (ImGui::InputInt("Height", (int*)&height))
+		{
 			RegenerateTileMap();
+			RegenerateTileCollision();
+		}
 		if (ImGui::InputInt("Spacing", (int*)&spacing))
+		{
 			RegenerateTileMap();
+			RegenerateTileCollision();
+		}
 
 		ImGui::Checkbox("bCollision", &bCollision);
 		ImGui::Checkbox("bView", &bView);
@@ -147,6 +169,86 @@ void TileMap::GUI()
 //			LoadTileMap();
 //	}
 //	ImGui::End();
+}
+
+void TileMap::PlayerCollisions(shared_ptr<Player> player)
+{
+	bool bGround = false;
+	for (auto& tileCollision : tileCollisions)
+	{
+		if (player->GetAnimRect()->GET_COMP(Collider)->Intersect(tileCollision->GetLineRect()->GET_COMP(Collider)))
+		{
+			Collision::RECT playerRect(player->GetAnimRect()->GetPosition(), player->GetAnimRect()->GetScale());
+			Collision::RECT tileRect(tileCollision->GetLineRect()->GetPosition(), tileCollision->GetLineRect()->GetScale());
+
+			// À§
+			if ((playerRect.max.x >= tileRect.min.x && playerRect.min.x <= tileRect.max.x) && playerRect.min.y > tileCollision->GetLineRect()->GetPosition().y)
+			{
+				bGround = true;
+				player->SetVel(0.0f);
+				player->SetJumpSpeed(0.0f);
+		
+				player->GetAnimRect()->SetPosition(Vector2(player->GetAnimRect()->GetPosition().x, (tileCollision->GetLineRect()->GetPosition().y + tileCollision->GetLineRect()->GetScale().y / 2) + player->GetAnimRect()->GetScale().y / 2));
+			} // ¾Æ·¡
+			else if ((playerRect.max.x >= tileRect.min.x && playerRect.min.x <= tileRect.max.x) && playerRect.max.y < tileCollision->GetLineRect()->GetPosition().y)
+			{
+				player->GetAnimRect()->SetPosition(Vector2(player->GetAnimRect()->GetPosition().x, (tileCollision->GetLineRect()->GetPosition().y - tileCollision->GetLineRect()->GetScale().y / 2) - player->GetAnimRect()->GetScale().y / 2));
+
+				player->SetVel(0.0f);
+				player->SetJumpSpeed(0.0f);
+			} // ¿·
+			else if (playerRect.max.x < tileCollision->GetLineRect()->GetPosition().x)
+			{
+				player->GetAnimRect()->Move(Vector2(-player->GetSpeed() * 2, 0));
+			}
+			else if (playerRect.min.x > tileCollision->GetLineRect()->GetPosition().y)
+			{
+				player->GetAnimRect()->Move(Vector2(player->GetSpeed() * 2, 0));
+			}
+		}
+	}
+
+	if (bGround)
+		player->SetIsGround(true);
+	else
+		player->SetIsGround(false);
+}
+
+void TileMap::SetTileCollisions(Vector2 Index)
+{
+	bool check = false;
+	for (int i = 0; i < tileCollisions.size(); ++i)
+	{
+		if (tileCollisions[i]->GetTileIndex() == Index)
+		{
+			check = true;
+			if (!bCollision)
+				tileCollisions.erase(tileCollisions.begin() + i);
+		}
+	}
+	
+	if (!check && bCollision)
+		tileCollisions.push_back(make_shared<TileCollision>(Vector2(Index.x, Index.y)));
+}
+
+void TileMap::RegenerateTileCollision()
+{
+	for (int i = 0; i < tileCollisions.size(); ++i)
+	{
+		if (tileCollisions[i]->GetTileIndex().y >= width
+			|| tileCollisions[i]->GetTileIndex().x >= height)
+		{
+			tileCollisions.erase(tileCollisions.begin() + i);
+			i = -1;
+		}
+	}
+
+	for (auto& tileCollision : tileCollisions)
+	{
+		Tile tile = tiles[tileCollision->GetTileIndex().x][tileCollision->GetTileIndex().y];
+
+		tileCollision->Resize(tile, spacing);
+	}
 }
 
 void TileMap::GenerateTileMap(UINT width, UINT height, UINT spacing)
@@ -214,6 +316,7 @@ Tile* TileMap::GetTile(const Vector2& unprojectedMousePos)
 	if (x >= width || y >= height || x < 0 || y < 0)
 		return nullptr;
 
+	SetTileCollisions(Vector2(y, x));
 	return &tiles[y][x];
 }
 

@@ -14,7 +14,7 @@ public:
 private:
 	unique_ptr<TileMap> tileMap;
 
-	unique_ptr<Player> player;
+	shared_ptr<Player> player;
 
-	bool bMod = false;
+	bool bMod = true;
 };

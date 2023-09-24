@@ -17,13 +17,21 @@ public:
 
 	void GUI();
 
+public:
+	void PlayerCollisions(shared_ptr<class Player> player);
+
 private:
+	void SetTileCollisions(Vector2 Index);
+	void RegenerateTileCollision();
 	void GenerateTileMap(UINT width, UINT height, UINT spacing);
 	void RegenerateTileMap();
 	Tile* GetTile(const Vector2& unprojectedMousePos);
 
 	void SaveTileMap(const wstring& path = L"");
 	void LoadTileMap(const wstring& path = L"");
+
+public:
+	vector<shared_ptr<TileCollision>> GetTileCollisions() { return tileCollisions; }
 
 private:
 	UINT width = 0, height = 0;
@@ -40,7 +48,8 @@ private:
 	ComPtr<ID3D11BlendState> blendState;
 
 	unique_ptr<class TileSet> tileSet;
+	vector<shared_ptr<TileCollision>> tileCollisions;
 
 	bool bCollision = false;
-	bool bView = false;
+	bool bView = true;
 };

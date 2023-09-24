@@ -104,6 +104,8 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="Character\Player.cpp" />
+    <ClCompile Include="Objects\LineRect.cpp" />
+    <ClCompile Include="TileMap\TileCollision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Program.h" />
@@ -225,6 +227,8 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Character\Player.h" />
+    <ClInclude Include="Objects\LineRect.h" />
+    <ClInclude Include="TileMap\TileCollision.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utilities">

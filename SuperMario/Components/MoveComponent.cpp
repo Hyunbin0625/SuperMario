@@ -4,6 +4,7 @@
 MoveComponent::MoveComponent(float maxSpeed, const string& name)
 	:Component(name), maxSpeed(maxSpeed)
 {
+	speed = maxSpeed;
 }
 
 void MoveComponent::Update()

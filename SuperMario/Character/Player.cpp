@@ -59,13 +59,54 @@ Player::Player(const Vector2& position, const float& scale)
 
 	// Components
 	animRect->AddComponent(make_shared<ColliderComponent>(ColliderType::RECT));
-	animRect->AddComponent(make_shared<MoveComponent>(100.0f));
+	animRect->AddComponent(make_shared<MoveComponent>(speed));
 }
 
 void Player::Update()
 {
+	if (bMod)
+	{
+		if ((!(ImGui::IsAnyItemActive()) && animRect->GET_COMP(Collider)->Intersect(INPUT->GetMousePosition()) && INPUT->Press(VK_LBUTTON)) || bClick)
+		{
+			if (INPUT->Press(VK_LBUTTON))
+				bClick = true;
+			else
+				bClick = false;
+			position = INPUT->GetMousePosition();
+		}
 
-	if (INPUT->Press(VK_LEFT))
+		animRect->SetPosition(position);
+		vel = 0.0f;
+		jumpSpeed = 0.0f;
+	}
+	
+	if (INPUT->Press(VK_SPACE) && bGround)
+	{
+		jumpSpeed = jumpMaxSpeed;
+		bGround = false;
+	}
+
+	if (!bGround && !bMod)
+	{
+		vel += (float)(G * Gdrainage * DELTA);
+		jumpSpeed -= vel * DELTA;
+		animRect->Move(Vector2(0, jumpSpeed) * totalSize);
+	}
+	else if(!bMod)
+	{
+		vel = 0.0f;
+		jumpSpeed = 0.0f;
+	}
+
+	if (!bGround)
+	{
+		state = PlayerState::Jump;
+		if (INPUT->Press(VK_LEFT))
+			direction = Direction::L;
+		else if (INPUT->Press(VK_RIGHT))
+			direction = Direction::R;
+	}
+	else if (INPUT->Press(VK_LEFT))
 	{
 		state = PlayerState::Run;
 		direction = Direction::L;
@@ -139,6 +180,32 @@ void Player::Update()
 		}
 		break;
 	case Jump:
+		if (direction)
+		{
+			if (hp == 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SJumpR");
+				animRect->SetScale(Vector2(18, 22) * totalSize);
+			}
+			else if (hp > 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BJumpR");
+				animRect->SetScale(Vector2(18, 30) * totalSize);
+			}
+		}
+		else
+		{
+			if (hp == 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SJumpL");
+				animRect->SetScale(Vector2(18, 22) * totalSize);
+			}
+			else if (hp > 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BJumpL");
+				animRect->SetScale(Vector2(18, 30) * totalSize);
+			}
+		}
 		break;
 	case Up:
 		break;
@@ -151,7 +218,6 @@ void Player::Update()
 	default:
 		break;
 	}
-
 
 	animRect->Update();
 }
@@ -166,8 +232,11 @@ void Player::GUI()
 	if (ImGui::BeginTabItem("Player"))
 	{
 		ImGui::SliderFloat2("Position", (float*)&position, CAMERA->GetPosition().x, CAMERA->GetPosition().x + WIN_DEFAULT_WIDTH);
-		ImGui::SliderFloat("Scale", &totalSize, 0.0f, 2.0f, "%.1f");
-	//	ImGui::SliderFloat("Speed", &speed, 100.0f, 2000.0f, "%.1f");
+		ImGui::SliderFloat("Scale", &totalSize, 0.0f, 10.0f);
+		if (ImGui::InputFloat("Speed", &speed, 1.0f, 100.0f))
+			animRect->GET_COMP(Move)->SetSpeed(speed);
+		ImGui::InputFloat("Jump", &jumpMaxSpeed, 1.0f, 100.0f);
+		ImGui::InputFloat("G_Drainage", &Gdrainage, 1.0f, 100.0f);
 
 		string textHp = "Player Hp : " + to_string(hp);
 		ImGui::Text(textHp.c_str());

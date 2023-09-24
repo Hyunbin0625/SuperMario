@@ -160,10 +160,12 @@ extern float gWinHeight;
 #include "Objects/Object.h"
 #include "Objects/Drawable.h"
 #include "Objects/ColorRect.h"
+#include "Objects/LineRect.h"
 #include "Objects/TextureRect.h"
 #include "Objects/AnimationRect.h"
 
 // TileMap
+#include "TileMap/TileCollision.h"
 #include "TileMap/TileMap.h"
 
 // Character
