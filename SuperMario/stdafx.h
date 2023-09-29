@@ -176,3 +176,11 @@ extern float gWinHeight;
 
 // Scenes
 #include "Scenes/IScene.h"
+
+#include "Block/IBlock.h"
+#include "Block/IItem.h"
+
+#include "Block/ItemSet.h"
+#include "Block/S_Radish.h"
+
+#include "Character/IEnemy.h"

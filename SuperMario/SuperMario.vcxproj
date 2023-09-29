@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Block\ItemSet.cpp" />
+    <ClCompile Include="Block\S_Radish.cpp" />
     <ClCompile Include="Components\AnimatorComponent.cpp" />
     <ClCompile Include="Components\ColliderComponent.cpp" />
     <ClCompile Include="Components\ColorComponent.cpp" />
@@ -65,6 +67,11 @@
     <ClCompile Include="Utilities\String.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Block\IBlock.h" />
+    <ClInclude Include="Block\IItem.h" />
+    <ClInclude Include="Block\ItemSet.h" />
+    <ClInclude Include="Block\S_Radish.h" />
+    <ClInclude Include="Character\IEnemy.h" />
     <ClInclude Include="Components\AnimatorComponent.h" />
     <ClInclude Include="Components\ColliderComponent.h" />
     <ClInclude Include="Components\ColorComponent.h" />

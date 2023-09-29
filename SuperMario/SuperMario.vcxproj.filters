@@ -106,6 +106,8 @@
     <ClCompile Include="Character\Player.cpp" />
     <ClCompile Include="Objects\LineRect.cpp" />
     <ClCompile Include="TileMap\TileCollision.cpp" />
+    <ClCompile Include="Block\S_Radish.cpp" />
+    <ClCompile Include="Block\ItemSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Program.h" />
@@ -229,6 +231,11 @@
     <ClInclude Include="Character\Player.h" />
     <ClInclude Include="Objects\LineRect.h" />
     <ClInclude Include="TileMap\TileCollision.h" />
+    <ClInclude Include="Block\IBlock.h" />
+    <ClInclude Include="Block\IItem.h" />
+    <ClInclude Include="Block\S_Radish.h" />
+    <ClInclude Include="Block\ItemSet.h" />
+    <ClInclude Include="Character\IEnemy.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utilities">

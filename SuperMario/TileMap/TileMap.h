@@ -31,6 +31,9 @@ private:
 	void LoadTileMap(const wstring& path = L"");
 
 public:
+	int GetSpacing() { return (int)spacing; }
+
+public:
 	vector<shared_ptr<TileCollision>> GetTileCollisions() { return tileCollisions; }
 
 private:

@@ -34,23 +34,30 @@ Player::Player(const Vector2& position, const float& scale)
 	animRect->AddAnimClip(make_shared<AnimationClip>(L"BUp", L"_Textures/B_Mario_Up.png", 2, false, true, 0.1));
 
 	// Hold
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHold", L"_Textures/S_Mario_Hold.png", 2, false, false, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHold", L"_Textures/S_Mario_Hold.png", 2, true, false, 0.1));
 
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHold", L"_Textures/B_Mario_Hold.png", 2, false, false, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHold", L"_Textures/B_Mario_Hold.png", 2, true, false, 0.1));
+
+	// Hold_Idle
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHoldIdleR", L"_Textures/S_Mario_Hold_Idle_R.png", 1, false, false, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHoldIdleL", L"_Textures/S_Mario_Hold_Idle_L.png", 1, false, false, 0.1));
+
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHoldIdleR", L"_Textures/B_Mario_Hold_Idle_R.png", 1, false, false, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHoldIdleL", L"_Textures/B_Mario_Hold_Idle_L.png", 1, false, false, 0.1));
 
 	// Hold_Run
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHoldRunR", L"_Textures/S_Mario_Hold_Run_R.png", 2, false, true, 0.1));
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHoldRunL", L"_Textures/S_Mario_Hold_Run_L.png", 2, false, true, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHoldRunR", L"_Textures/S_Mario_Hold_Run_R.png", 2, false, true, 0.15));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"SHoldRunL", L"_Textures/S_Mario_Hold_Run_L.png", 2, false, true, 0.15));
 
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHoldRunR", L"_Textures/B_Mario_Hold_Run_R.png", 2, false, true, 0.1));
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHoldRunL", L"_Textures/B_Mario_Hold_Run_L.png", 2, false, true, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHoldRunR", L"_Textures/B_Mario_Hold_Run_R.png", 2, false, true, 0.15));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"BHoldRunL", L"_Textures/B_Mario_Hold_Run_L.png", 2, false, true, 0.15));
 
 	// Throw
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"SIdleR", L"_Textures/S_Mario_Throw_R.png", 1, false, true, 0.1));
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"SIdleL", L"_Textures/S_Mario_Throw_L.png", 1, false, true, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"SThrowR", L"_Textures/S_Mario_Throw_R.png", 1, false, false, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"SThrowL", L"_Textures/S_Mario_Throw_L.png", 1, false, false, 0.1));
 
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"BIdleR", L"_Textures/B_Mario_Throw_R.png", 1, false, true, 0.1));
-	animRect->AddAnimClip(make_shared<AnimationClip>(L"BIdleL", L"_Textures/B_Mario_Throw_L.png", 1, false, true, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"BThrowR", L"_Textures/B_Mario_Throw_R.png", 1, false, false, 0.1));
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"BThrowL", L"_Textures/B_Mario_Throw_L.png", 1, false, false, 0.1));
 
 	// AddAnimator
 	animRect->AddComponent(make_shared<AnimatorComponent>(animRect->GetAnimClips()));
@@ -60,6 +67,20 @@ Player::Player(const Vector2& position, const float& scale)
 	// Components
 	animRect->AddComponent(make_shared<ColliderComponent>(ColliderType::RECT));
 	animRect->AddComponent(make_shared<MoveComponent>(speed));
+}
+
+void Player::Init()
+{
+	animRect->SetPosition(position);
+	animRect->SetRotation(0.0f);
+
+	hp = 1;
+	vel = 0;
+	jumpSpeed = 0;
+
+	bHolding = false;
+	bHold = false;
+	bThrow = false;
 }
 
 void Player::Update()
@@ -74,10 +95,7 @@ void Player::Update()
 				bClick = false;
 			position = INPUT->GetMousePosition();
 		}
-
-		animRect->SetPosition(position);
-		vel = 0.0f;
-		jumpSpeed = 0.0f;
+		Init();
 	}
 	
 	if (INPUT->Press(VK_SPACE) && bGround)
@@ -98,7 +116,18 @@ void Player::Update()
 		jumpSpeed = 0.0f;
 	}
 
-	if (!bGround)
+	if ((bHold && INPUT->Press(VK_UP)) || bThrow)
+	{
+		bHold = false;
+		bThrow = true;
+		state = PlayerState::Throw;
+	}
+	else if ((!bHold && !bThrow) && (INPUT->Press(VK_DOWN) || bHolding))
+	{
+		bHolding = true;
+		state = PlayerState::Hold;
+	}
+	else if (!bGround)
 	{
 		state = PlayerState::Jump;
 		if (INPUT->Press(VK_LEFT))
@@ -106,18 +135,21 @@ void Player::Update()
 		else if (INPUT->Press(VK_RIGHT))
 			direction = Direction::R;
 	}
-	else if (INPUT->Press(VK_LEFT))
-	{
-		state = PlayerState::Run;
-		direction = Direction::L;
-	}
-	else if (INPUT->Press(VK_RIGHT))
-	{
-		state = PlayerState::Run;
-		direction = Direction::R;
-	}
 	else
-		state = PlayerState::Idle;
+	{
+		if (INPUT->Press(VK_LEFT))
+		{
+			state = PlayerState::Run;
+			direction = Direction::L;
+		}
+		else if (INPUT->Press(VK_RIGHT))
+		{
+			state = PlayerState::Run;
+			direction = Direction::R;
+		}
+		else
+			state = PlayerState::Idle;
+	}
 
 	switch (state)
 	{
@@ -128,26 +160,58 @@ void Player::Update()
 		{
 			if (hp == 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SIdleR");
-				animRect->SetScale(Vector2(17, 22) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SHoldIdleR");
+					animRect->SetScale(Vector2(18, 22) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SIdleR");
+					animRect->SetScale(Vector2(17, 22) * totalSize);
+				}
 			}
 			else if (hp > 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BIdleR");
-				animRect->SetScale(Vector2(18, 30) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BHoldIdleR");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BIdleR");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}	
 			}
 		}
 		else
 		{
 			if (hp == 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SIdleL");
-				animRect->SetScale(Vector2(17, 22) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SHoldIdleL");
+					animRect->SetScale(Vector2(18, 22) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SIdleL");
+					animRect->SetScale(Vector2(17, 22) * totalSize);
+				}
 			}
 			else if (hp > 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BIdleL");
-				animRect->SetScale(Vector2(18, 30) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BHoldIdleL");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BIdleL");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}
 			}
 		}
 		break;
@@ -156,26 +220,58 @@ void Player::Update()
 		{
 			if (hp == 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SRunR");
-				animRect->SetScale(Vector2(17, 22) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SHoldRunR");
+					animRect->SetScale(Vector2(18, 22) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SRunR");
+					animRect->SetScale(Vector2(17, 22)* totalSize);
+				}
 			}
 			else if (hp > 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BRunR");
-				animRect->SetScale(Vector2(18, 30) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BHoldRunR");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BRunR");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}
 			}
 		}
 		else
 		{
 			if (hp == 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SRunL");
-				animRect->SetScale(Vector2(17, 22) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SHoldRunL");
+					animRect->SetScale(Vector2(18, 22) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SRunL");
+					animRect->SetScale(Vector2(17, 22) * totalSize);
+				}
 			}
 			else if (hp > 1)
 			{
-				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BRunL");
-				animRect->SetScale(Vector2(18, 30) * totalSize);
+				if (bHold)
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BHoldRunL");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}
+				else
+				{
+					animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BRunL");
+					animRect->SetScale(Vector2(18, 30) * totalSize);
+				}
 			}
 		}
 		break;
@@ -207,11 +303,51 @@ void Player::Update()
 			}
 		}
 		break;
-	case Up:
-		break;
 	case Hold:
+		if (hp == 1)
+		{
+			animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SHold");
+			animRect->SetScale(Vector2(17, 22) * totalSize);
+		}
+		else if (hp > 1)
+		{
+			animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BHold");
+			animRect->SetScale(Vector2(18, 30) * totalSize);
+		}
 		break;
 	case Throw:
+		if (direction)
+		{
+			if (hp == 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SThrowR");
+				animRect->SetScale(Vector2(18, 22) * totalSize);
+			}
+			else if (hp > 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BThrowR");
+				animRect->SetScale(Vector2(18, 30) * totalSize);
+			}
+		}
+		else
+		{
+			if (hp == 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"SThrowL");
+				animRect->SetScale(Vector2(18, 22) * totalSize);
+			}
+			else if (hp > 1)
+			{
+				animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"BThrowL");
+				animRect->SetScale(Vector2(18, 30) * totalSize);
+			}
+		}
+		dletaTime += DELTA;
+		if (dletaTime >= 0.3f)
+		{
+			dletaTime = 0.0f;
+			bThrow = false;
+		}
 		break;
 	case Death:
 		break;

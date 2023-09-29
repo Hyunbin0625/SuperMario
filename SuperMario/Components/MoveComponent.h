@@ -15,11 +15,7 @@ public:
 	void SetSpeed(float speed) { this->speed = speed; }
 	void SetMaxSpeed(float maxSpeed) { this->maxSpeed = maxSpeed; }
 
-	void AddKeyCount() { ++keyCount; }
-	void ResetKeyCount() { keyCount = 0; }
-
 private:
 	float maxSpeed = 300.0f;
 	float speed = maxSpeed;
-	UINT keyCount = 0;
 };
