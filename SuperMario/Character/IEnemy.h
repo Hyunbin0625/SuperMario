@@ -3,7 +3,9 @@
 enum class EnemyType
 {
 	None = -1,
-	
+	Shyguy,
+	Turtle,
+	Wart
 };
 
 #pragma pack(push, 1)
@@ -16,10 +18,6 @@ struct EnemyState
 	float speed = 0.0f;
 
 	int maxHp = 0;
-
-	bool bRegen = 0;
-	float regenTime = 0;
-
 	Direction direction = Direction::R;
 };
 #pragma pack(pop)

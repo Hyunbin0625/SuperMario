@@ -18,8 +18,10 @@ void ItemSet::SetTextID(const wstring& texturePath)
 
 void ItemSet::GUI()
 {
-	if (ImGui::BeginTabItem("Item"))
+	if (ImGui::BeginTabItem("Object"))
 	{
+		string title = "Item";
+		ImGui::Text(title.c_str());
 		int index = 0;
 		selectedIndex = -1;
 

@@ -108,6 +108,7 @@
     <ClCompile Include="TileMap\TileCollision.cpp" />
     <ClCompile Include="Block\S_Radish.cpp" />
     <ClCompile Include="Block\ItemSet.cpp" />
+    <ClCompile Include="Character\Shyguy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Program.h" />
@@ -236,6 +237,7 @@
     <ClInclude Include="Block\S_Radish.h" />
     <ClInclude Include="Block\ItemSet.h" />
     <ClInclude Include="Character\IEnemy.h" />
+    <ClInclude Include="Character\Shyguy.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utilities">

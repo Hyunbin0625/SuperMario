@@ -184,3 +184,4 @@ extern float gWinHeight;
 #include "Block/S_Radish.h"
 
 #include "Character/IEnemy.h"
+#include "Character/Shyguy.h"
