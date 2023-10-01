@@ -7,8 +7,6 @@ enum PlayerState
 	Run,
 	Jump,
 	Hold,
-	Hold_Idle,
-	Hold_Run,
 	Throw,
 	Death
 };
@@ -35,12 +33,15 @@ public:
 public:
 	shared_ptr<AnimationRect> GetAnimRect() { return animRect; }
 	Direction GetDirection() { return direction; }
+	int GetHp() { return hp; }
 	Vector2 GetPosition() { return position; }
 	float GetSpeed() { return speed; }
 
 	bool GetIsHolding() { return bHolding; }
 	bool GetIsHold() { return bHold; }
 	bool GetIsThrow() { return bThrow; }
+
+	void SetHit(bool bHit) { if (state != PlayerState::Hold)this->bHit = bHit; }
 
 	void SetVel(float vel) { this->vel = vel; }
 	void SetJumpSpeed(float jumpSpeed) { this->jumpSpeed = jumpSpeed; }
@@ -57,7 +58,11 @@ private:
 	PlayerState state = PlayerState::None;
 	Direction direction = Direction::R;
 
-	int hp = 1;
+	int hp = 3;
+
+	float hitCTime = 0.0f;
+	bool bHit = 0;
+
 	Vector2 position = Vector2();
 	float totalSize = 1.0f;
 	float speed = 200.0f;

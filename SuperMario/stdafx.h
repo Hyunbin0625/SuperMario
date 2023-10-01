@@ -119,6 +119,7 @@ extern float gWinHeight;
 #include "Systems/Gui.h"
 #include "Systems/Sound.h"
 #include "Systems/Camera.h"
+#include "Systems/UI.h"
 
 #define INPUT Input::Get()
 #define TIME Time::Get()
@@ -129,6 +130,7 @@ extern float gWinHeight;
 #define IMGUI Gui::Get()
 #define SOUND Sound::Get()
 #define CAMERA Camera::Get()
+#define UI Ui::Get()
 
 // Renders
 #include "Renders/Resources/VertexType.h"
@@ -184,4 +186,6 @@ extern float gWinHeight;
 #include "Block/S_Radish.h"
 
 #include "Character/IEnemy.h"
+#include "Character/EnemySet.h"
 #include "Character/Shyguy.h"
+#include "Character/Turtle.h"

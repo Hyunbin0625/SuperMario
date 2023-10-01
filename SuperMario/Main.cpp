@@ -11,7 +11,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ int       nCmdShow)
 {
     WinDesc desc;
-    desc.appName = L"Cuphead";
+    desc.appName = L"SuperMario";
     desc.instance = hInstance;
     desc.handle = nullptr;
     desc.width = WIN_DEFAULT_WIDTH;

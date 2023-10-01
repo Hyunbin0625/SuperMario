@@ -85,6 +85,19 @@ void Gui::ItemGUIS(vector<shared_ptr<class IItem>>& trVec, const char* name)
 	ImGui::End();
 }
 
+void Gui::EnemyGUIS(vector<shared_ptr<class IEnemy>>& trVec, const char* name)
+{
+	if (trVec.empty()) return;
+
+	bool temp = true;
+	if (ImGui::Begin(name), &temp)
+	{
+		for (UINT i = 0; i < trVec.size(); ++i)
+			trVec[i]->GUI(i);
+	}
+	ImGui::End();
+}
+
 void Gui::ApplyStyle()
 {
 }

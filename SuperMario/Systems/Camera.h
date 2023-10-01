@@ -13,6 +13,7 @@ public:
 	void UpdateProj();
 
 public:
+	void ZoomSet(Vector2 LB, Vector2 RT);
 	void ZoomIn();
 	void ZoomOut();
 	void InitZoom();

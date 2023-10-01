@@ -14,11 +14,8 @@ struct ItemState
 {
 	ItemType type = ItemType::None;
 
-	Vector2 position = Vector2();
-	Vector2 size = Vector2();
+	Vector2 position = Vector2();;
 	float totalSize = 1.0f;
-
-	bool bCheck = true;
 };
 #pragma pack(pop)
 
@@ -41,6 +38,7 @@ public:
 	virtual shared_ptr<TextureRect> GetTextureRect() = 0;
 	virtual bool GetDelete() = 0;
 	virtual ItemState GetState() = 0;
+	virtual bool GetIsThrow() = 0;
 
 	virtual void SetState(ItemState state) = 0;
 

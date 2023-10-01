@@ -19,6 +19,7 @@ public:
 	virtual shared_ptr<TextureRect> GetTextureRect() override { return textureRect; }
 	virtual bool GetDelete() override { return bDelete; }
 	virtual ItemState GetState() override { return state; }
+	virtual bool GetIsThrow() override { return bThrow; }
 
 	virtual void SetIsGround(bool bGround) override { this->bGround = bGround; }
 
@@ -36,9 +37,12 @@ private:
 
 	bool bHolding = false;
 	bool bHold = false;
-	bool bDeath = false;
+	bool bThrow = false;
 
+	bool bDeath = false;
+	bool bCheck = true;
 	bool bGround = false;
+
 	bool bMod = true;
 	bool bDelete = false;
 

@@ -57,6 +57,14 @@ void Camera::UpdateProj()
 	VPBuffer->SetProjection(projection);
 }
 
+void Camera::ZoomSet(Vector2 LB, Vector2 RT)
+{
+	this->LB = LB;
+	this->RT = RT;
+
+	UpdateProj();
+}
+
 void Camera::ZoomIn()
 {
 	if (LB.y + zoomSpeed * DELTA >= RT.y - zoomSpeed * DELTA)

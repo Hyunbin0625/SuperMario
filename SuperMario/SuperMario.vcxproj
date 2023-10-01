@@ -21,7 +21,9 @@
   <ItemGroup>
     <ClCompile Include="Block\ItemSet.cpp" />
     <ClCompile Include="Block\S_Radish.cpp" />
+    <ClCompile Include="Character\EnemySet.cpp" />
     <ClCompile Include="Character\Shyguy.cpp" />
+    <ClCompile Include="Character\Turtle.cpp" />
     <ClCompile Include="Components\AnimatorComponent.cpp" />
     <ClCompile Include="Components\ColliderComponent.cpp" />
     <ClCompile Include="Components\ColorComponent.cpp" />
@@ -57,6 +59,7 @@
     <ClCompile Include="Systems\Input.cpp" />
     <ClCompile Include="Systems\Sound.cpp" />
     <ClCompile Include="Systems\Time.cpp" />
+    <ClCompile Include="Systems\UI.cpp" />
     <ClCompile Include="Systems\Window.cpp" />
     <ClCompile Include="TileMap\TileCollision.cpp" />
     <ClCompile Include="TileMap\TileMap.cpp" />
@@ -72,8 +75,10 @@
     <ClInclude Include="Block\IItem.h" />
     <ClInclude Include="Block\ItemSet.h" />
     <ClInclude Include="Block\S_Radish.h" />
+    <ClInclude Include="Character\EnemySet.h" />
     <ClInclude Include="Character\IEnemy.h" />
     <ClInclude Include="Character\Shyguy.h" />
+    <ClInclude Include="Character\Turtle.h" />
     <ClInclude Include="Components\AnimatorComponent.h" />
     <ClInclude Include="Components\ColliderComponent.h" />
     <ClInclude Include="Components\ColorComponent.h" />
@@ -109,6 +114,7 @@
     <ClInclude Include="Systems\Input.h" />
     <ClInclude Include="Systems\Sound.h" />
     <ClInclude Include="Systems\Time.h" />
+    <ClInclude Include="Systems\UI.h" />
     <ClInclude Include="Systems\Window.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TileMap\TileCollision.h" />

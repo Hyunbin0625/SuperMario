@@ -41,6 +41,6 @@ void ItemSet::GUI()
 				ImGui::SameLine();
 		}
 
-	ImGui::EndTabItem();
+		ImGui::EndTabItem();
 	}
 }

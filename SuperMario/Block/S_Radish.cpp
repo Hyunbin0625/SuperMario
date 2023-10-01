@@ -3,9 +3,9 @@
 
 S_Radish::S_Radish(const Vector2& position, const float& totalSize)
 {
-	state = { ItemType::S_Radish, position, Vector2(10, 16), totalSize };
+	state = { ItemType::S_Radish, position, totalSize };
 
-	textureRect = make_shared<TextureRect>(position, state.size * totalSize, 0.0f, L"_Textures/S_Radish.png");
+	textureRect = make_shared<TextureRect>(position, Vector2(10, 16) * totalSize, 0.0f, L"_Textures/S_Radish.png");
 
 	textureRect->AddComponent(make_shared<ColliderComponent>(ColliderType::RECT));
 }
@@ -14,9 +14,8 @@ void S_Radish::Init()
 {
 	// State
 	textureRect->SetPosition(state.position);
-	textureRect->SetScale(state.size * state.totalSize);
+	textureRect->SetScale(Vector2(10, 16) * state.totalSize);
 	textureRect->SetRotation(0.0f);
-	state.bCheck = true;
 
 	vel = 0.0f;
 	jumpSpeed = 0.0f;
@@ -24,7 +23,10 @@ void S_Radish::Init()
 
 	bHolding = false;
 	bHold = false;
+	bThrow = false;
+
 	bDeath = false;
+	bCheck = true;
 }
 
 void S_Radish::Collision(shared_ptr<Player> player)
@@ -32,11 +34,12 @@ void S_Radish::Collision(shared_ptr<Player> player)
 	if (player->GetIsThrow() && bHold)
 	{
 		bHold = false;
-		speed = player->GetAnimRect()->GET_COMP(Move)->GetSpeed() + 300.0f;
+		bThrow = true;
+		speed = player->GetAnimRect()->GET_COMP(Move)->GetSpeed() + 200.0f;
 		if (!(bool)player->GetDirection())
 			speed *= -1;
 		vel = 0.0f;
-		jumpSpeed = 100.0f;
+		jumpSpeed = 50.0f;
 	}
 	else if (player->GetIsHold() && bHold)
 	{
@@ -61,20 +64,24 @@ void S_Radish::Collision(shared_ptr<Player> player)
 void S_Radish::Reverse()
 {
 	speed *= -1 * 0.3f;
+	bThrow = false;
 }
 
 void S_Radish::Death()
 {
+	vel = 0.0f;
+	jumpSpeed = 20.0f;
 	if (speed > 0)
 	{
 		speed = -50.0f;
-		textureRect->SetRotation(-135.0f);
+		textureRect->SetRotation(textureRect->GetRotation() - 45.0f);
 	}
 	else
 	{
 		speed = 50.0f;
-		textureRect->SetRotation(135.0f);
+		textureRect->SetRotation(textureRect->GetRotation() + 45.0f);
 	}
+	bThrow = false;
 	bDeath = true;
 }
 
@@ -94,20 +101,27 @@ void S_Radish::Update()
 		Init();
 	}
 
+	if (bGround)
+		bThrow = false;
+
 	if ((!bGround && !bHolding && !bHold && !bMod) || bDeath)
 	{
 		vel += (float)(G * Gdrainage * DELTA);
 		jumpSpeed -= vel * DELTA;
 		textureRect->Move(Vector2(speed, jumpSpeed) * state.totalSize);
+
+		if (bDeath && textureRect->GetPosition().y <= CAMERA->GetPosition().y - textureRect->GetScale().y)
+			bCheck = false;
 	}
-	textureRect->SetScale(state.size * state.totalSize);
+	textureRect->SetScale(Vector2(10, 16) * state.totalSize);
 
 	textureRect->Update();
 }
 
 void S_Radish::Render()
 {
-	textureRect->Render();
+	if (bCheck)
+		textureRect->Render();
 }
 
 void S_Radish::GUI(int ordinal)

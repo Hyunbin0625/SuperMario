@@ -109,6 +109,9 @@
     <ClCompile Include="Block\S_Radish.cpp" />
     <ClCompile Include="Block\ItemSet.cpp" />
     <ClCompile Include="Character\Shyguy.cpp" />
+    <ClCompile Include="Character\EnemySet.cpp" />
+    <ClCompile Include="Systems\UI.cpp" />
+    <ClCompile Include="Character\Turtle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Program.h" />
@@ -238,6 +241,9 @@
     <ClInclude Include="Block\ItemSet.h" />
     <ClInclude Include="Character\IEnemy.h" />
     <ClInclude Include="Character\Shyguy.h" />
+    <ClInclude Include="Character\EnemySet.h" />
+    <ClInclude Include="Systems\UI.h" />
+    <ClInclude Include="Character\Turtle.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utilities">

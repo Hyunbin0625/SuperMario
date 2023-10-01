@@ -29,8 +29,9 @@ public:
 	virtual ~IEnemy() = default;
 
 public:
-	virtual void Collision(shared_ptr<Player> player) = 0;
 	virtual void Init() = 0;
+	virtual void Collision(shared_ptr<Player> player) = 0;
+	virtual void Turn() = 0;
 	virtual void Destroy() = 0;
 
 	virtual void Update() = 0;
@@ -41,10 +42,11 @@ public:
 	virtual int GetHp() = 0;
 	virtual bool GetDelete() = 0;
 	virtual EnemyState GetState() = 0;
+	virtual bool GetIsThrow() = 0;
+
 
 	virtual void SetState(EnemyState state) = 0;
-	virtual void SetHit(bool hit) = 0;
+	virtual void SetHit(bool hit, Vector2 hitPos) = 0;
 	virtual void SetGroundPos(Vector2 groundPos) = 0;
-	virtual void SetWall(bool bWall) = 0;
-	virtual void SetMod(bool mod) = 0;
+	virtual void SetIsMod(bool bMod) = 0;
 };

@@ -31,6 +31,7 @@ private:
 	void LoadTileMap(const wstring& path = L"");
 
 public:
+	Vector2 GetTileMapScale() { return (Vector2(width, height) * spacing); }
 	int GetSpacing() { return (int)spacing; }
 
 public:

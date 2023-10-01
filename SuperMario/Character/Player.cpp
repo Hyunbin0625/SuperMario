@@ -74,7 +74,7 @@ void Player::Init()
 	animRect->SetPosition(position);
 	animRect->SetRotation(0.0f);
 
-	hp = 1;
+	hp = 3;
 	vel = 0;
 	jumpSpeed = 0;
 
@@ -96,6 +96,20 @@ void Player::Update()
 			position = INPUT->GetMousePosition();
 		}
 		Init();
+	}
+
+	// Hit
+	if (bHit && hitCTime <= 0.0f)
+	{
+		hitCTime = 2.0f;
+		hp -= bHit;
+		bHit = 0;
+	}
+
+	if (hitCTime >= 0.0f)
+	{
+		hitCTime -= 1 * DELTA;
+		bHit = 0;
 	}
 	
 	if (INPUT->Press(VK_SPACE) && bGround)
