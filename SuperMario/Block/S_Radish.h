@@ -3,8 +3,7 @@
 class S_Radish : public IItem
 {
 public:
-	S_Radish() : S_Radish(Vector2(), 1.0f) {}
-	S_Radish(const Vector2& position, const float& totalSize);
+	S_Radish(const Vector2& position, const float& totalSize, bool bCreated = false);
 
 public:
 	virtual void Init() override;
@@ -20,10 +19,9 @@ public:
 	virtual bool GetDelete() override { return bDelete; }
 	virtual ItemState GetState() override { return state; }
 	virtual bool GetIsThrow() override { return bThrow; }
+	virtual bool GetIsCreated() override { return bCreated; }
 
 	virtual void SetIsGround(bool bGround) override { this->bGround = bGround; }
-
-	virtual void SetState(ItemState state) override { this->state = state; }
 	virtual void SetIsMod(bool bMod) override { this->bMod = bMod; }
 
 private:
@@ -43,6 +41,7 @@ private:
 	bool bCheck = true;
 	bool bGround = false;
 
+	bool bCreated = false;
 	bool bMod = true;
 	bool bDelete = false;
 

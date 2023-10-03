@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Turtle.h"
 
-Turtle::Turtle(const Vector2& position, float totailSize, float speed, int maxHp, Direction direction)
-	: state({ EnemyType::Turtle, position, totailSize, speed, maxHp, direction })
+Turtle::Turtle(const Vector2& position, float totailSize, float speed, float Gdrainage, int maxHp, Direction direction)
+	: state({ EnemyType::Turtle, position, totailSize, speed, Gdrainage, maxHp, direction })
 {
 	// ÃÊ±âÈ­
 	this->hp = state.maxHp;
@@ -139,7 +139,7 @@ void Turtle::Update()
 			Death();
 		bDeath = true;
 
-		vel += (float)(G * Gdrainage * DELTA);
+		vel += (float)(G * state.Gdrainage * DELTA);
 		jumpSpeed -= vel * DELTA;
 		animRect->Move(Vector2(speed, jumpSpeed) * state.totalSize);
 
@@ -158,7 +158,7 @@ void Turtle::Update()
 
 		if (!bGround)
 		{
-			vel += (float)(G * Gdrainage * DELTA);
+			vel += (float)(G * state.Gdrainage * DELTA);
 			jumpSpeed -= vel * DELTA;
 			if (direction)
 				animRect->Move(Vector2(speed, jumpSpeed) * state.totalSize);
@@ -191,7 +191,7 @@ void Turtle::Update()
 
 		if (!bGround)
 		{
-			vel += (float)(G * Gdrainage * DELTA);
+			vel += (float)(G * state.Gdrainage * DELTA);
 			jumpSpeed -= vel * DELTA;
 			animRect->Move(Vector2(0, jumpSpeed) * state.totalSize);
 		}
@@ -255,7 +255,7 @@ void Turtle::GUI(int ordinal)
 		ImGui::SliderFloat2("Position", (float*)&state.position, CAMERA->GetPosition().x, CAMERA->GetPosition().x + WIN_DEFAULT_WIDTH);
 		ImGui::SliderFloat("Size", &state.totalSize, 0.1f, 5.0f, "%.2f");
 		ImGui::SliderFloat("Speed", &state.speed, 10.0f, 500.0f, "%.2f");
-		ImGui::InputFloat("G_Drainage", &Gdrainage, 1.0f, 100.0f);
+		ImGui::InputFloat("G_Drainage", &state.Gdrainage, 1.0f, 100.0f);
 		ImGui::InputInt("MaxHp", &state.maxHp);
 		
 		bool r = 0, l = 0;

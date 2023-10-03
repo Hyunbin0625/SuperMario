@@ -10,7 +10,7 @@ struct Tile
 class TileMap : public Drawable
 {
 public:
-	TileMap(const Vector2& position, const Vector2& scale, float rotation, const wstring& tileSetPath = L"", UINT tileXCount = 0, UINT tileYCount = 0, UINT spacing = 40);
+	TileMap(const Vector2& position, const Vector2& scale, float rotation, Color backGroundColor, const wstring& tileSetPath = L"", UINT tileXCount = 0, UINT tileYCount = 0, UINT spacing = 40);
 
 	void Update() override;
 	void Render() override;
@@ -23,6 +23,7 @@ public:
 private:
 	void SetTileCollisions(Vector2 Index);
 	void RegenerateTileCollision();
+	void RegenerateBackGround();
 	void GenerateTileMap(UINT width, UINT height, UINT spacing);
 	void RegenerateTileMap();
 	Tile* GetTile(const Vector2& unprojectedMousePos);
@@ -31,8 +32,12 @@ private:
 	void LoadTileMap(const wstring& path = L"");
 
 public:
+	Vector2 GetTileIndex(const Vector2& position);
+	Vector2 GetTilePos(const Vector2& tileIndex) { return tiles[tileIndex.x][tileIndex.y].pos; }
 	Vector2 GetTileMapScale() { return (Vector2(width, height) * spacing); }
 	int GetSpacing() { return (int)spacing; }
+
+	bool GetIsRegenerate() { return bRegenerate; }
 
 public:
 	vector<shared_ptr<TileCollision>> GetTileCollisions() { return tileCollisions; }
@@ -54,6 +59,10 @@ private:
 	unique_ptr<class TileSet> tileSet;
 	vector<shared_ptr<TileCollision>> tileCollisions;
 
+	unique_ptr<ColorRect> backGround;
+	Color color = Color();
+
 	bool bCollision = false;
 	bool bView = true;
+	bool bRegenerate = false;
 };

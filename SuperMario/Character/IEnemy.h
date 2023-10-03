@@ -17,6 +17,8 @@ struct EnemyState
 	float totalSize = 1;
 	float speed = 0.0f;
 
+	float Gdrainage = 0.0f;
+
 	int maxHp = 0;
 	Direction direction = Direction::R;
 };
@@ -44,8 +46,6 @@ public:
 	virtual EnemyState GetState() = 0;
 	virtual bool GetIsThrow() = 0;
 
-
-	virtual void SetState(EnemyState state) = 0;
 	virtual void SetHit(bool hit, Vector2 hitPos) = 0;
 	virtual void SetGroundPos(Vector2 groundPos) = 0;
 	virtual void SetIsMod(bool bMod) = 0;

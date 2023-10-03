@@ -3,7 +3,6 @@
 enum class BlockType
 {
 	None = -1,
-	RandomBox,
 	Grass_01,
 };
 
@@ -13,7 +12,7 @@ struct BlockState
 	BlockType type = BlockType::None;
 	Vector2 tlieIndex = Vector2();
 
-	bool bCheck = true;
+	float regen = -1;	// -1 : false, 0~ : regenTime
 };
 #pragma pack(pop)
 
@@ -24,18 +23,23 @@ public:
 	virtual ~IBlock() = default;
 
 public:
-	virtual bool Collision(shared_ptr<Player> player) = 0;
+	virtual void Init() = 0;
+	virtual void Collision(shared_ptr<Player> player) = 0;
 
 	virtual void Update() = 0;
 	virtual void Render() = 0;
 	virtual void GUI(int ordinal) = 0;
 
-	virtual shared_ptr<AnimationRect> GetAnimRect() = 0;
 	virtual shared_ptr<TextureRect> GetTextureRect() = 0;
-	virtual bool GetDelete() = 0;
 	virtual BlockState GetState() = 0;
-	virtual bool GetCollision() = 0;
+	virtual ItemType GetItemType() = 0;
+	virtual bool GetIsHolding() = 0;
+	virtual bool GetIsClick() = 0;
+	virtual bool GetDelete() = 0;
 
-	virtual void SetState(BlockState state) = 0;
-	virtual void SetMod(bool mod) = 0;
+	virtual void SetTileIndex(Vector2 tileIndex) = 0;
+	virtual void SetSpacing(UINT spacing) = 0;
+	virtual void SetIsHolding(bool bHolding) = 0;
+	virtual void SetIsCheck(bool bCheck) = 0;
+	virtual void SetIsMod(bool mod) = 0;
 };

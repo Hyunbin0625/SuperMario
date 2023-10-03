@@ -4,6 +4,7 @@
 ItemSet::ItemSet()
 {
 	SetTextID(L"_Textures/S_Radish.png");
+	SetTextID(L"_Textures/B_Radish.png");
 }
 
 void ItemSet::SetTextID(const wstring& texturePath)

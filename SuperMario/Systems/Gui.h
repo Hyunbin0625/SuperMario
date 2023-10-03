@@ -16,6 +16,7 @@ public:
 	void TextureRectGUIS(vector<shared_ptr<class TextureRect>>& trVec, const char* name);
 	void ItemGUIS(vector<shared_ptr<class IItem>>& trVec, const char* name);
 	void EnemyGUIS(vector<shared_ptr<class IEnemy>>& trVec, const char* name);
+	void BlockGUIS(vector<shared_ptr<class IBlock>>& trVec, const char* name);
 
 private:
 	void ApplyStyle();

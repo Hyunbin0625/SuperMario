@@ -3,8 +3,6 @@
 enum class ItemType
 {
 	None = -1,
-	Star,
-	Coin,
 	S_Radish,
 	B_Radish,
 };
@@ -39,8 +37,7 @@ public:
 	virtual bool GetDelete() = 0;
 	virtual ItemState GetState() = 0;
 	virtual bool GetIsThrow() = 0;
-
-	virtual void SetState(ItemState state) = 0;
+	virtual bool GetIsCreated() = 0;
 
 	virtual void SetIsGround(bool bGround) = 0;
 	virtual void SetIsMod(bool mod) = 0;

@@ -3,12 +3,13 @@
 
 void Test::Init()
 {
-	tileMap = make_unique<TileMap>(Vector2(), Vector2(WIN_DEFAULT_WIDTH, WIN_DEFAULT_HEIGHT), 0.0f, L"_Textures/World1_Block.png", 16, 16);
+	tileMap = make_unique<TileMap>(Vector2(), Vector2(WIN_DEFAULT_WIDTH, WIN_DEFAULT_HEIGHT), 0.0f, Color(0.35f, 0.7f, 1.0f, 1.0f), L"_Textures/World1_Block.png", 16, 16);
 
 	player = make_shared<Player>(CENTER, 2.0f);
 
 	itemSet = make_unique<ItemSet>();
 	enemySet = make_unique<EnemySet>();
+	blockSet = make_unique<BlockSet>();
 }
 
 void Test::Destroy()
@@ -19,12 +20,15 @@ void Test::Destroy()
 void Test::Update()
 {
 	Collision();
-	tileMap->PlayerCollisions(player);
+	if (!player->GetIsDeath())
+		tileMap->PlayerCollisions(player);
 
 	for (const auto& item : itemList)
 		item->Collision(player);
 	for (const auto& enemy : enemyList)
 		enemy->Collision(player);
+	for (const auto& block : blockList)
+		block->Collision(player);
 
 	// Delete Item
 	for (int i = 0; i < itemList.size(); ++i)
@@ -38,14 +42,73 @@ void Test::Update()
 		if (enemyList[i]->GetDelete())
 			enemyList.erase(enemyList.begin() + i);
 	}
+	// Delete Block
+	for (int i = 0; i < blockList.size(); ++i)
+	{
+		if (blockList[i]->GetDelete())
+			blockList.erase(blockList.begin() + i);
+	}
+
 	// Add Item
 	if (itemSet->GetSelectedIndex() == 0)
 		itemList.push_back(make_shared<S_Radish>(CAMERA->GetPosition() + CENTER, 2.0f));
+	else if (itemSet->GetSelectedIndex() == 1)
+		itemList.push_back(make_shared<B_Radish>(CAMERA->GetPosition() + CENTER, 2.0f));
 	// Add Enemy
 	if (enemySet->GetSelectedIndex() == 0)
-		enemyList.push_back(make_shared<Shyguy>(CAMERA->GetPosition() + CENTER, 2.0f, 60.0f, 1, Direction::L));
+		enemyList.push_back(make_shared<Shyguy>(CAMERA->GetPosition() + CENTER, 2.0f, 60.0f, 150.0f, 1, Direction::L));
 	else if (enemySet->GetSelectedIndex() == 1)
-		enemyList.push_back(make_shared<Turtle>(CAMERA->GetPosition() + CENTER, 2.0f, 50.0f, 1, Direction::L));
+		enemyList.push_back(make_shared<Turtle>(CAMERA->GetPosition() + CENTER, 2.0f, 50.0f, 150.0f, 1, Direction::L));
+	else if (enemySet->GetSelectedIndex() == 2)
+		enemyList.push_back(make_shared<Wart>(CAMERA->GetPosition() + CENTER, 2.0f, 40.0f, 50.0f, 4, Direction::L));
+	// Add Block
+	if (blockSet->GetSelectedIndex() == 0)
+		blockList.push_back(make_shared<Grass_01>(CAMERA->GetPosition() + CENTER, tileMap->GetSpacing()));
+
+	// TileMap이 변형되었을 때
+	if (tileMap->GetIsRegenerate())
+	{
+		for (auto& block : blockList)
+		{
+			block->GetTextureRect()->SetPosition(tileMap->GetTilePos(block->GetState().tlieIndex));
+			block->SetSpacing(tileMap->GetSpacing());
+		}
+	}
+
+	if (bMod)
+	{
+		for (auto& block : blockList)
+		{
+			if (!block->GetIsClick())
+			{
+				Vector2 tileIndex = tileMap->GetTileIndex(block->GetTextureRect()->GetPosition());
+				block->SetTileIndex(tileIndex);
+				block->GetTextureRect()->SetPosition(tileMap->GetTilePos(tileIndex) + Vector2(tileMap->GetSpacing(), tileMap->GetSpacing()) * 0.5f);
+			}
+		}
+
+		// Delete Item
+		for (int i = 0; i < itemList.size(); ++i)
+		{
+			if (itemList[i]->GetIsCreated())
+				itemList.erase(itemList.begin() + i);
+		}
+	}
+	else
+	{
+		for (auto& block : blockList)
+		{
+			if (block->GetIsHolding())
+			{
+				if (block->GetItemType() == ItemType::S_Radish)
+					itemList.push_back(make_shared<S_Radish>(block->GetTextureRect()->GetPosition(), 2.0f, true));
+				else if (block->GetItemType() == ItemType::B_Radish)
+					itemList.push_back(make_shared<B_Radish>(block->GetTextureRect()->GetPosition(), 2.0f, true));
+				block->SetIsHolding(false);
+				block->SetIsCheck(false);
+			}
+		}
+	}
 
 	if (!bMod)
 	{
@@ -63,6 +126,9 @@ void Test::Update()
 	// EnemyList Update
 	for (const auto& enemy : enemyList)
 		enemy->Update();
+	// BlockList Update
+	for (const auto& block : blockList)
+		block->Update();
 
 	tileMap->Update();
 	player->Update();
@@ -86,6 +152,9 @@ void Test::Render()
 	// EnemyList Render
 	for (const auto& enemy : enemyList)
 		enemy->Render();
+	// BlockList Render
+	for (const auto& block : blockList)
+		block->Render();
 	UI->Render();
 }
 
@@ -93,6 +162,7 @@ void Test::PostRender()
 {
 	IMGUI->ItemGUIS(itemList, "ItemList");
 	IMGUI->EnemyGUIS(enemyList, "EnemyList");
+	IMGUI->BlockGUIS(blockList, "BlockList");
 
 	if (ImGui::BeginTabBar("Tool"))
 	{
@@ -100,6 +170,8 @@ void Test::PostRender()
 		itemSet->GUI();
 		ImGui::NewLine();
 		enemySet->GUI();
+		ImGui::NewLine();
+		blockSet->GUI();
 		player->GUI();
 
 		if (ImGui::BeginTabItem("MapDetails"))
@@ -113,13 +185,14 @@ void Test::PostRender()
 				item->SetIsMod(bMod);
 			for (const auto& enemy : enemyList)
 				enemy->SetIsMod(bMod);
+			for (const auto& block : blockList)
+				block->SetIsMod(bMod);
 	
 			ImGui::EndTabItem();
 		}
 
 		ImGui::EndTabBar();
 	}
-
 }
 
 void Test::Collision()

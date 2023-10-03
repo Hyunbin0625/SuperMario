@@ -40,6 +40,7 @@ public:
 	bool GetIsHolding() { return bHolding; }
 	bool GetIsHold() { return bHold; }
 	bool GetIsThrow() { return bThrow; }
+	bool GetIsDeath() { return bDeath; }
 
 	void SetHit(bool bHit) { if (state != PlayerState::Hold)this->bHit = bHit; }
 
@@ -58,18 +59,19 @@ private:
 	PlayerState state = PlayerState::None;
 	Direction direction = Direction::R;
 
-	int hp = 3;
+	int hp = 0;
+	int maxHp = 3;
 
 	float hitCTime = 0.0f;
-	bool bHit = 0;
+	bool bHit = false;
 
 	Vector2 position = Vector2();
 	float totalSize = 1.0f;
 	float speed = 200.0f;
 
-	float vel = 0;
+	float vel = 0.0f;
 	float Gdrainage = 150.0f;
-	float jumpSpeed = 0;
+	float jumpSpeed = 0.0f;
 	float jumpMaxSpeed = 200;
 
 	float dletaTime = 0.0f;
@@ -78,6 +80,7 @@ private:
 	bool bHold = false;
 	bool bThrow = false;
 
+	bool bDeath = false;
 	bool bGround = false;
 	bool bClick = false;
 	bool bMod = true;

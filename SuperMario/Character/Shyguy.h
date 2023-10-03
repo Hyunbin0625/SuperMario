@@ -10,7 +10,7 @@ enum class ShyguyState
 class Shyguy : public IEnemy
 {
 public:	
-	Shyguy(const Vector2& position, float totailSize, float speed, int maxHp, Direction direction);
+	Shyguy(const Vector2& position, float totailSize, float speed, float Gdrainage, int maxHp, Direction direction);
 
 public:
 	virtual void Init() override;
@@ -28,7 +28,6 @@ public:
 	virtual EnemyState GetState() override { return state; }
 	virtual bool GetIsThrow() override { return bThrow; }
 
-	virtual void SetState(EnemyState state)  override { this->state = state; }
 	virtual void SetHit(bool hit, Vector2 hitPos) override { hp -= hit; this->hitPos = hitPos; }
 	virtual void SetGroundPos(Vector2 groundPos) override { this->groundPos = groundPos; }
 	virtual void SetIsMod(bool bMod) override  { this->bMod = bMod; }
@@ -55,7 +54,6 @@ private:
 	float speed = 0.0f;
 
 	float vel = 0.0f;
-	float Gdrainage = 150.0f;
 	float jumpSpeed = 0.0f;
 
 	bool bHolding = false;

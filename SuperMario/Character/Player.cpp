@@ -59,6 +59,9 @@ Player::Player(const Vector2& position, const float& scale)
 	animRect->AddAnimClip(make_shared<AnimationClip>(L"BThrowR", L"_Textures/B_Mario_Throw_R.png", 1, false, false, 0.1));
 	animRect->AddAnimClip(make_shared<AnimationClip>(L"BThrowL", L"_Textures/B_Mario_Throw_L.png", 1, false, false, 0.1));
 
+	// Death
+	animRect->AddAnimClip(make_shared<AnimationClip>(L"Death", L"_Textures/Mario_Death.png", 1, false, false, 0.1));
+
 	// AddAnimator
 	animRect->AddComponent(make_shared<AnimatorComponent>(animRect->GetAnimClips()));
 	// animRect SetAnimator
@@ -74,13 +77,23 @@ void Player::Init()
 	animRect->SetPosition(position);
 	animRect->SetRotation(0.0f);
 
-	hp = 3;
-	vel = 0;
-	jumpSpeed = 0;
+	hp = maxHp;
+
+	hitCTime = 0.0f;
+	bHit = false;
+
+	vel = 0.0f;
+	jumpSpeed = 0.0f;
+
+	dletaTime = 0.0f;
 
 	bHolding = false;
 	bHold = false;
 	bThrow = false;
+
+	bDeath = false;
+	bGround = false;
+	bClick = false;
 }
 
 void Player::Update()
@@ -118,19 +131,34 @@ void Player::Update()
 		bGround = false;
 	}
 
-	if (!bGround && !bMod)
+	if (!bGround && !bMod && !bDeath)
 	{
 		vel += (float)(G * Gdrainage * DELTA);
 		jumpSpeed -= vel * DELTA;
 		animRect->Move(Vector2(0, jumpSpeed) * totalSize);
 	}
-	else if(!bMod)
+	else if(!bMod && !bDeath)
 	{
 		vel = 0.0f;
 		jumpSpeed = 0.0f;
 	}
 
-	if ((bHold && INPUT->Press(VK_UP)) || bThrow)
+	if (hp <= 0)
+	{
+		if (!bDeath)
+		{
+			vel = 0.0f;
+			jumpSpeed = 250.0f;
+			bDeath = true;
+		}
+
+		vel += (float)(G * Gdrainage * DELTA);
+		jumpSpeed -= vel * DELTA;
+		animRect->Move(Vector2(0, jumpSpeed) * totalSize);
+
+		state = PlayerState::Death;
+	}
+	else if ((bHold && INPUT->Press(VK_UP)) || bThrow)
 	{
 		bHold = false;
 		bThrow = true;
@@ -364,8 +392,7 @@ void Player::Update()
 		}
 		break;
 	case Death:
-		break;
-	default:
+		animRect->GET_COMP(Animator)->SetCurrentAnimClip(L"Death");
 		break;
 	}
 

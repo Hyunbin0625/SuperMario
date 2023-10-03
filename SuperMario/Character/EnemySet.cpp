@@ -5,6 +5,7 @@ EnemySet::EnemySet()
 {
 	SetTextID(L"_Textures/Shyguy_Icon.png");
 	SetTextID(L"_Textures/Turtle_Icon.png");
+	SetTextID(L"_Textures/Wart_Idle_L.png");
 }
 
 void EnemySet::SetTextID(const wstring& texturePath)

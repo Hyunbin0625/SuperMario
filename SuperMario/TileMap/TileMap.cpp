@@ -2,8 +2,8 @@
 #include "TileSet.h"
 #include "TileMap.h"
 
-TileMap::TileMap(const Vector2& position, const Vector2& scale, float rotation, const wstring& tileSetPath, UINT tileXCount, UINT tileYCount, UINT spacing)
-	: Drawable("TileMap", position, scale, rotation, L"_Shaders/VertexTile.hlsl"), spacing(spacing)
+TileMap::TileMap(const Vector2& position, const Vector2& scale, float rotation, Color backGroundColor, const wstring& tileSetPath, UINT tileXCount, UINT tileYCount, UINT spacing)
+	: Drawable("TileMap", position, scale, rotation, L"_Shaders/VertexTile.hlsl"), color(backGroundColor), spacing(spacing)
 {
 	tileSet = make_unique<TileSet>(tileSetPath, tileXCount, tileYCount);
 
@@ -56,6 +56,8 @@ TileMap::TileMap(const Vector2& position, const Vector2& scale, float rotation, 
 	}
 
 	tileCollisions.reserve(10);
+
+	backGround = make_unique<ColorRect>(scale * 0.5f, scale, 0.0f, color);
 }
 
 void TileMap::Update()
@@ -79,12 +81,15 @@ void TileMap::Update()
 		}
 	}
 
+	backGround->Update();
 	for (auto& tileCollision : tileCollisions)
 		tileCollision->Update();
 }
 
 void TileMap::Render()
 {
+	backGround->Render();
+
 	SUPER::Render();
 
 	IB->SetIA();
@@ -141,17 +146,32 @@ void TileMap::GUI()
 		{
 			RegenerateTileMap();
 			RegenerateTileCollision();
+			RegenerateBackGround();
+			bRegenerate = true;
 		}
 		if (ImGui::InputInt("Height", (int*)&height))
 		{
 			RegenerateTileMap();
 			RegenerateTileCollision();
+			RegenerateBackGround();
+			bRegenerate = true;
 		}
 		if (ImGui::InputInt("Spacing", (int*)&spacing))
 		{
 			RegenerateTileMap();
 			RegenerateTileCollision();
+			RegenerateBackGround();
+			bRegenerate = true;
 		}
+
+		string name = "BackGroundColor(0~1)";
+		ImGui::Text(name.c_str());
+		if (ImGui::InputFloat("R", &color.x, 0.1f, 1.0f))
+			backGround->GET_COMP(Color)->SetColor(color);
+		if (ImGui::InputFloat("G", &color.y, 0.1f, 1.0f))
+			backGround->GET_COMP(Color)->SetColor(color);
+		if(ImGui::InputFloat("B", &color.z, 0.1f, 1.0f))
+			backGround->GET_COMP(Color)->SetColor(color);
 
 		ImGui::Checkbox("bCollision", &bCollision);
 		ImGui::Checkbox("bView", &bView);
@@ -243,12 +263,19 @@ void TileMap::RegenerateTileCollision()
 		}
 	}
 
+	// TileCollision
 	for (auto& tileCollision : tileCollisions)
 	{
 		Tile tile = tiles[tileCollision->GetTileIndex().x][tileCollision->GetTileIndex().y];
 
 		tileCollision->Resize(tile, spacing);
 	}
+}
+
+void TileMap::RegenerateBackGround()
+{
+	backGround->SetPosition((Vector2(width, height) * spacing) * 0.5f);
+	backGround->SetScale(Vector2(width, height) * spacing);
 }
 
 void TileMap::GenerateTileMap(UINT width, UINT height, UINT spacing)
@@ -371,4 +398,15 @@ void TileMap::LoadTileMap(const wstring& path)
 
 		in.close();
 	}
+}
+
+Vector2 TileMap::GetTileIndex(const Vector2& position)
+{
+	UINT x = (UINT)position.x / spacing;
+	UINT y = (UINT)position.y / spacing;
+
+	if (x >= width || y >= height || x < 0 || y < 0)
+		return Vector2(-1, -1);
+
+	return Vector2(y, x);
 }

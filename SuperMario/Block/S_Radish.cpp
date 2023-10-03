@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "S_Radish.h"
 
-S_Radish::S_Radish(const Vector2& position, const float& totalSize)
+S_Radish::S_Radish(const Vector2& position, const float& totalSize, bool bCreated)
+	: bCreated(bCreated)
 {
 	state = { ItemType::S_Radish, position, totalSize };
 
@@ -50,7 +51,7 @@ void S_Radish::Collision(shared_ptr<Player> player)
 		bHolding = true;
 		textureRect->SetPosition(Vector2(player->GetAnimRect()->GetPosition().x, textureRect->GetPosition().y));
 
-		textureRect->Move(Vector2(0, 50));
+		textureRect->Move(Vector2(0, 80));
 		if (textureRect->GetPosition().y >= player->GetAnimRect()->GetPosition().y + player->GetAnimRect()->GetScale().y / 2)
 		{
 			bHolding = false;
@@ -126,7 +127,7 @@ void S_Radish::Render()
 
 void S_Radish::GUI(int ordinal)
 {
-	string objName = to_string(ordinal) + ". ";
+	string objName = to_string(ordinal) + ". S_Radish";
 
 	if (ImGui::BeginMenu(objName.c_str()))
 	{

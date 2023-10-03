@@ -25,5 +25,9 @@ private:
 	vector<shared_ptr<IEnemy>> enemyList;
 	unique_ptr<EnemySet> enemySet;
 
+	vector<shared_ptr<IBlock>> blockList;
+	unique_ptr<BlockSet> blockSet;
+
+
 	bool bMod = true;
 };
