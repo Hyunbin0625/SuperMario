@@ -17,6 +17,9 @@ public:
 
 	void GUI();
 
+	void SaveFile(ofstream& out);
+	void LoadFile(ifstream& in);
+
 public:
 	void PlayerCollisions(shared_ptr<class Player> player);
 
@@ -27,9 +30,6 @@ private:
 	void GenerateTileMap(UINT width, UINT height, UINT spacing);
 	void RegenerateTileMap();
 	Tile* GetTile(const Vector2& unprojectedMousePos);
-
-	void SaveTileMap(const wstring& path = L"");
-	void LoadTileMap(const wstring& path = L"");
 
 public:
 	Vector2 GetTileIndex(const Vector2& position);

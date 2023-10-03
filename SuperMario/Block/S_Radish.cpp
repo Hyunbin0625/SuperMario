@@ -34,6 +34,7 @@ void S_Radish::Collision(shared_ptr<Player> player)
 {
 	if (player->GetIsThrow() && bHold)
 	{
+		cout << "Throw\n";
 		bHold = false;
 		bThrow = true;
 		speed = player->GetAnimRect()->GET_COMP(Move)->GetSpeed() + 200.0f;
@@ -44,10 +45,12 @@ void S_Radish::Collision(shared_ptr<Player> player)
 	}
 	else if (player->GetIsHold() && bHold)
 	{
+		cout << "Hold\n";
 		textureRect->SetPosition(player->GetAnimRect()->GetPosition() + Vector2(0, player->GetAnimRect()->GetScale().y / 2));
 	}
 	else if (textureRect->GET_COMP(Collider)->Intersect(player->GetAnimRect()->GET_COMP(Collider)) && player->GetIsHolding())
 	{
+		cout << "Holding\n";
 		bHolding = true;
 		textureRect->SetPosition(Vector2(player->GetAnimRect()->GetPosition().x, textureRect->GetPosition().y));
 
@@ -60,6 +63,7 @@ void S_Radish::Collision(shared_ptr<Player> player)
 			player->SetIsHold(true);
 		}
 	}
+//	cout << player->GetIsHolding() << '\n';
 }
 
 void S_Radish::Reverse()

@@ -117,6 +117,7 @@
     <ClCompile Include="Block\Grass_01.cpp" />
     <ClCompile Include="Block\BlockSet.cpp" />
     <ClCompile Include="Block\B_Radish.cpp" />
+    <ClCompile Include="Block\Next_Door.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Program.h" />
@@ -254,6 +255,7 @@
     <ClInclude Include="Block\Grass_01.h" />
     <ClInclude Include="Block\BlockSet.h" />
     <ClInclude Include="Block\B_Radish.h" />
+    <ClInclude Include="Block\Next_Door.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utilities">

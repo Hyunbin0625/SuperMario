@@ -186,6 +186,7 @@ extern float gWinHeight;
 
 #include "Block/IBlock.h"
 #include "Block/BlockSet.h"
+// #include "Block/Next_Door.h"
 #include "Block/Grass_01.h"
 
 #include "Character/IEnemy.h"

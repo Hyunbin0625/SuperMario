@@ -3,6 +3,7 @@
 enum class BlockType
 {
 	None = -1,
+//	Next_Door,
 	Grass_01,
 };
 

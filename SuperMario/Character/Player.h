@@ -30,6 +30,9 @@ public:
 
 	void GUI();
 
+	void SaveFile(ofstream& out);
+	void LoadFile(ifstream& in);
+
 public:
 	shared_ptr<AnimationRect> GetAnimRect() { return animRect; }
 	Direction GetDirection() { return direction; }

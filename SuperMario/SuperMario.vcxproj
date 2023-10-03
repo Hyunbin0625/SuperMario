@@ -23,6 +23,7 @@
     <ClCompile Include="Block\B_Radish.cpp" />
     <ClCompile Include="Block\Grass_01.cpp" />
     <ClCompile Include="Block\ItemSet.cpp" />
+    <ClCompile Include="Block\Next_Door.cpp" />
     <ClCompile Include="Block\S_Radish.cpp" />
     <ClCompile Include="Character\BubbleManager.cpp" />
     <ClCompile Include="Character\EnemySet.cpp" />
@@ -82,6 +83,7 @@
     <ClInclude Include="Block\IBlock.h" />
     <ClInclude Include="Block\IItem.h" />
     <ClInclude Include="Block\ItemSet.h" />
+    <ClInclude Include="Block\Next_Door.h" />
     <ClInclude Include="Block\S_Radish.h" />
     <ClInclude Include="Character\BubbleManager.h" />
     <ClInclude Include="Character\EnemySet.h" />

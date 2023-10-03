@@ -426,3 +426,41 @@ void Player::GUI()
 		ImGui::EndTabItem();
 	}
 }
+
+void Player::SaveFile(ofstream& out)
+{
+	// Start Pos
+	out.write((char*)&position.x, sizeof(position.x));
+	out.write((char*)&position.y, sizeof(position.y));
+
+	// Size
+	out.write((char*)&totalSize, sizeof(totalSize));
+
+	// Speed
+	out.write((char*)&speed, sizeof(speed));
+
+	//Jump Speed
+	out.write((char*)&jumpMaxSpeed, sizeof(jumpMaxSpeed));
+
+	//Max Hp
+	out.write((char*)&maxHp, sizeof(maxHp));
+}
+
+void Player::LoadFile(ifstream& in)
+{
+	// Start Pos
+	in.read((char*)&position.x, sizeof(position.x));
+	in.read((char*)&position.y, sizeof(position.y));
+
+	// Size
+	in.read((char*)&totalSize, sizeof(totalSize));
+
+	// Speed
+	in.read((char*)&speed, sizeof(speed));
+
+	//Jump Speed
+	in.read((char*)&jumpMaxSpeed, sizeof(jumpMaxSpeed));
+
+	//Max Hp
+	in.read((char*)&maxHp, sizeof(maxHp));
+}

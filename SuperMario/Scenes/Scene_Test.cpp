@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "Scene_Test.h"
 
+int world_current = 0;
+
 void Test::Init()
 {
+	world_current = 0;
+
 	tileMap = make_unique<TileMap>(Vector2(), Vector2(WIN_DEFAULT_WIDTH, WIN_DEFAULT_HEIGHT), 0.0f, Color(0.35f, 0.7f, 1.0f, 1.0f), L"_Textures/World1_Block.png", 16, 16);
 
 	player = make_shared<Player>(CENTER, 2.0f);
@@ -10,6 +14,9 @@ void Test::Init()
 	itemSet = make_unique<ItemSet>();
 	enemySet = make_unique<EnemySet>();
 	blockSet = make_unique<BlockSet>();
+
+	wstring path = L"_Maps/World_0" + to_wstring(world_current + 1) + L".tile";
+	LoadTileMap(path);
 }
 
 void Test::Destroy()
@@ -62,6 +69,8 @@ void Test::Update()
 	else if (enemySet->GetSelectedIndex() == 2)
 		enemyList.push_back(make_shared<Wart>(CAMERA->GetPosition() + CENTER, 2.0f, 40.0f, 50.0f, 10, Direction::L));
 	// Add Block
+//	if (blockSet->GetSelectedIndex() == 0)
+//		blockList.push_back(make_shared<Next_Door>(CAMERA->GetPosition() + CENTER, tileMap->GetSpacing()));
 	if (blockSet->GetSelectedIndex() == 0)
 		blockList.push_back(make_shared<Grass_01>(CAMERA->GetPosition() + CENTER, tileMap->GetSpacing()));
 
@@ -161,51 +170,203 @@ void Test::Render()
 
 void Test::PostRender()
 {
-	IMGUI->ItemGUIS(itemList, "ItemList");
-	IMGUI->EnemyGUIS(enemyList, "EnemyList");
-	IMGUI->BlockGUIS(blockList, "BlockList");
-
-	if (ImGui::BeginTabBar("Tool"))
+	if (bMod)
 	{
-		tileMap->GUI();
-		itemSet->GUI();
-		ImGui::NewLine();
-		enemySet->GUI();
-		ImGui::NewLine();
-		blockSet->GUI();
-		player->GUI();
+		IMGUI->ItemGUIS(itemList, "ItemList");
+		IMGUI->EnemyGUIS(enemyList, "EnemyList");
+		IMGUI->BlockGUIS(blockList, "BlockList");
 
-		if (ImGui::BeginTabItem("MapDetails"))
+		if (ImGui::BeginTabBar("Tool"))
 		{
-			if (ImGui::Checkbox("CreateMod", &bMod))
-			{
-				CAMERA->SetPosition(player->GetPosition() - CENTER);
-			}
-			player->SetIsMod(bMod);
-			for (const auto& item : itemList)
-				item->SetIsMod(bMod);
-			for (const auto& enemy : enemyList)
-				enemy->SetIsMod(bMod);
-			for (const auto& block : blockList)
-				block->SetIsMod(bMod);
-	
-			ImGui::EndTabItem();
-		}
+			tileMap->GUI();
+			itemSet->GUI();
+			ImGui::NewLine();
+			enemySet->GUI();
+			ImGui::NewLine();
+			blockSet->GUI();
+			player->GUI();
 
-		ImGui::EndTabBar();
+			if (ImGui::BeginTabItem("MapDetails"))
+			{
+				const char* worlds[] = { "World_01", "World_02", "World_03", "World_04", "World_05", "World_06", "World_07" };
+				if (ImGui::Combo("World", &world_current, worlds, IM_ARRAYSIZE(worlds)))
+				{
+					wstring path = L"_Maps/World_0" + to_wstring(world_current + 1) + L".tile";
+					cout << String::ToString(path) << '\n';
+					LoadTileMap(path);
+				}
+
+				if (ImGui::Button("Play", ImVec2(50, 30)))
+				{
+					bMod = false;
+					CAMERA->SetPosition(player->GetPosition() - CENTER);
+				}
+				player->SetIsMod(bMod);
+				for (const auto& item : itemList)
+					item->SetIsMod(bMod);
+				for (const auto& enemy : enemyList)
+					enemy->SetIsMod(bMod);
+				for (const auto& block : blockList)
+					block->SetIsMod(bMod);
+
+				// File Save&Load
+				string name = "File Save&Load";
+				ImGui::Text(name.c_str());
+				if (ImGui::Button("Save", ImVec2(50, 30)))
+					SaveTileMap();
+				ImGui::SameLine();
+				if (ImGui::Button("Load", ImVec2(50, 30)))
+					LoadTileMap();
+
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
+	}
+	else
+	{
+		if (INPUT->Press(VK_ESCAPE))
+		{
+			bMod = true;
+			CAMERA->SetPosition(player->GetPosition() - CENTER);
+		}
 	}
 }
 
 void Test::SaveTileMap(const wstring& path)
 {
+	if (path.empty())
+	{
+		function<void(wstring)> func = bind(&Test::SaveTileMap, this, placeholders::_1);
+		Path::SaveFileDialog(L"", Path::TileMapFilter, L"_Maps/", func, gHandle);
+	}
+	else
+	{
+		ofstream out(path.c_str());
 
+		if (out.is_open())
+		{
+			// Player
+			player->SaveFile(out);
 
+			// TileMap
+			tileMap->SaveFile(out);
+
+			// ItemList
+			int listSize = (int)itemList.size();
+			out.write((char*)&listSize, sizeof(listSize));
+
+			ItemState itemState;
+			for (UINT i = 0; i < itemList.size(); ++i)
+			{
+				itemState = itemList[i]->GetState();
+				out.write((char*)&itemState, sizeof(itemState));
+			}
+
+			// EnemyList
+			listSize = (int)enemyList.size();
+			out.write((char*)&listSize, sizeof(listSize));
+
+			EnemyState enemyState;
+			for (UINT i = 0; i < enemyList.size(); ++i)
+			{
+				enemyState = enemyList[i]->GetState();
+				out.write((char*)&enemyState, sizeof(enemyState));
+			}
+
+			// BlockList
+			listSize = (int)blockList.size();
+			out.write((char*)&listSize, sizeof(listSize));
+
+			BlockState blockState;
+			for (UINT i = 0; i < blockList.size(); ++i)
+			{
+				blockState = blockList[i]->GetState();
+				out.write((char*)&blockState, sizeof(blockState));
+			}
+		}
+		out.close();
+	}
 }
 
 void Test::LoadTileMap(const wstring& path)
 {
+	if (path.empty())
+	{
+		function<void(wstring)> func = bind(&Test::LoadTileMap, this, placeholders::_1);
+		Path::OpenFileDialog(L"", Path::TileMapFilter, L"_Maps/", func, gHandle);
+	}
+	else
+	{
+		ifstream in(path.c_str());
 
+		if (in.is_open())
+		{
+			// Player
+			player->LoadFile(in);
 
+			// TileMap
+			tileMap->LoadFile(in);
+
+			// ItemList
+			int listSize;
+			in.read((char*)&listSize, sizeof(listSize));
+
+			itemList.clear();
+			itemList.resize(listSize);
+
+			ItemState itemState;
+			for (UINT i = 0; i < itemList.size(); ++i)
+			{
+				in.read((char*)&itemState, sizeof(itemState));
+
+				if (itemState.type == ItemType::S_Radish)
+					itemList[i] = make_shared<S_Radish>(itemState.position, itemState.totalSize);
+				else if (itemState.type == ItemType::B_Radish)
+					itemList[i] = make_shared<B_Radish>(itemState.position, itemState.totalSize);
+			}
+
+			// EnemyList
+			in.read((char*)&listSize, sizeof(listSize));
+
+			enemyList.clear();
+			enemyList.resize(listSize);
+
+			EnemyState enemyState;
+			for (UINT i = 0; i < enemyList.size(); ++i)
+			{
+				in.read((char*)&enemyState, sizeof(enemyState));
+
+				if (enemyState.type == EnemyType::Shyguy)
+					enemyList[i] = make_shared<Shyguy>(enemyState.position, enemyState.totalSize, enemyState.speed, enemyState.Gdrainage, enemyState.maxHp, enemyState.direction);
+				else if (enemyState.type == EnemyType::Turtle)
+					enemyList[i] = make_shared<Turtle>(enemyState.position, enemyState.totalSize, enemyState.speed, enemyState.Gdrainage, enemyState.maxHp, enemyState.direction);
+				else if (enemyState.type == EnemyType::Wart)
+					enemyList[i] = make_shared<Wart>(enemyState.position, enemyState.totalSize, enemyState.speed, enemyState.Gdrainage, enemyState.maxHp, enemyState.direction);
+			}
+
+			// BlockList
+			in.read((char*)&listSize, sizeof(listSize));
+
+			blockList.clear();
+			blockList.resize(listSize);
+
+			BlockState blockState;
+			for (UINT i = 0; i < blockList.size(); ++i)
+			{
+				in.read((char*)&blockState, sizeof(blockState));
+
+				Vector2 position = tileMap->GetTilePos(blockState.tlieIndex);
+				float spacing = tileMap->GetSpacing();
+			//	if (blockState.type == BlockType::Next_Door)
+			//		blockList[i] = make_shared<Next_Door>(position, spacing, blockState.tlieIndex, blockState.regen);
+				if (blockState.type == BlockType::Grass_01)
+					blockList[i] = make_shared<Grass_01>(position, spacing, blockState.tlieIndex, blockState.regen);
+			}
+		}
+		in.close();
+	}
 }
 
 void Test::Collision()

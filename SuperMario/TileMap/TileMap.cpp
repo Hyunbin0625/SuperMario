@@ -178,17 +178,70 @@ void TileMap::GUI()
 
 		ImGui::EndTabItem();
 	}
-	
-	// 나중에 이동
-//	if (ImGui::Begin("TileMap", &bOpen))
-//	{
-//		if (ImGui::Button("Save", ImVec2(50, 30)))
-//			SaveTileMap();
-//
-//		if (ImGui::Button("Load", ImVec2(50, 30)))
-//			LoadTileMap();
-//	}
-//	ImGui::End();
+}
+
+void TileMap::SaveFile(ofstream& out)
+{
+	// Tile Map
+	out.write((char*)&width, sizeof(width));
+	out.write((char*)&height, sizeof(height));
+	out.write((char*)&spacing, sizeof(spacing));
+
+	for (UINT i = 0; i < height; ++i)
+		out.write((char*)tiles[i].data(), sizeof(tiles[0][0]) * tiles[i].size());
+
+	// Tile Collisions
+	int listSize = (int)tileCollisions.size();
+	out.write((char*)&listSize, sizeof(listSize));
+
+	for (UINT i = 0; i < tileCollisions.size(); ++i)
+	{
+		Vector2 tileIndex = tileCollisions[i]->GetTileIndex();
+		out.write((char*)&tileIndex.x, sizeof(tileIndex.x));
+		out.write((char*)&tileIndex.y, sizeof(tileIndex.y));
+	}
+
+	// BackGround Color
+	out.write((char*)&color.x, sizeof(color.x));
+	out.write((char*)&color.y, sizeof(color.y));
+	out.write((char*)&color.z, sizeof(color.z));
+}
+
+void TileMap::LoadFile(ifstream& in)
+{
+	// Tile Map
+	in.read((char*)&width, sizeof(width));
+	in.read((char*)&height, sizeof(height));
+	in.read((char*)&spacing, sizeof(spacing));
+	GenerateTileMap(width, height, spacing);
+
+	for (UINT i = 0; i < height; ++i)
+		in.read((char*)tiles[i].data(), sizeof(tiles[0][0]) * tiles[i].size());
+
+	// Tile Collisions
+	int listSize;
+	in.read((char*)&listSize, sizeof(listSize));
+
+	tileCollisions.clear();
+	tileCollisions.resize(listSize);
+
+	Vector2 tileIndex;
+	for (UINT i = 0; i < tileCollisions.size(); ++i)
+	{
+		in.read((char*)&tileIndex.x, sizeof(tileIndex.x));
+		in.read((char*)&tileIndex.y, sizeof(tileIndex.y));
+
+		tileCollisions[i] = make_shared<TileCollision>(tileIndex);
+	}
+	RegenerateTileCollision();
+
+	// BackGround Color
+	color = Color(1, 1, 1, 1);
+	in.read((char*)&color.x, sizeof(color.x));
+	in.read((char*)&color.y, sizeof(color.y));
+	in.read((char*)&color.z, sizeof(color.z));
+
+	RegenerateBackGround();
 }
 
 void TileMap::PlayerCollisions(shared_ptr<Player> player)
@@ -276,6 +329,7 @@ void TileMap::RegenerateBackGround()
 {
 	backGround->SetPosition((Vector2(width, height) * spacing) * 0.5f);
 	backGround->SetScale(Vector2(width, height) * spacing);
+	backGround->GET_COMP(Color)->SetColor(color);
 }
 
 void TileMap::GenerateTileMap(UINT width, UINT height, UINT spacing)
@@ -345,59 +399,6 @@ Tile* TileMap::GetTile(const Vector2& unprojectedMousePos)
 
 	SetTileCollisions(Vector2(y, x));
 	return &tiles[y][x];
-}
-
-void TileMap::SaveTileMap(const wstring& path)
-{
-	if (path.empty())
-	{
-		function<void(wstring)> func = bind(&TileMap::SaveTileMap, this, placeholders::_1);
-		Path::SaveFileDialog(L"", Path::TileMapFilter, L"_Maps/", func, gHandle);
-	}
-	else
-	{
-		if (tiles.empty()) return;
-
-		ofstream out(path.c_str());
-
-		if (out.is_open())
-		{
-			out.write((char*)&width, sizeof(width));
-			out.write((char*)&height, sizeof(height));
-			out.write((char*)&spacing, sizeof(spacing));
-
-			for (UINT i = 0; i < height; ++i)
-				out.write((char*)tiles[i].data(), sizeof(tiles[0][0]) * tiles[i].size());
-		}
-
-		out.close();
-	}
-}
-
-void TileMap::LoadTileMap(const wstring& path)
-{
-	if (path.empty())
-	{
-		function<void(wstring)> func = bind(&TileMap::LoadTileMap, this, placeholders::_1);
-		Path::OpenFileDialog(L"", Path::TileMapFilter, L"_Maps/", func, gHandle);
-	}
-	else
-	{
-		ifstream in(path.c_str());
-
-		if (in.is_open())
-		{
-			in.read((char*)&width, sizeof(width));
-			in.read((char*)&height, sizeof(height));
-			in.read((char*)&spacing, sizeof(spacing));
-			GenerateTileMap(width, height, spacing);
-
-			for (UINT i = 0; i < height; ++i)
-				in.read((char*)tiles[i].data(), sizeof(tiles[0][0]) * tiles[i].size());
-		}
-
-		in.close();
-	}
 }
 
 Vector2 TileMap::GetTileIndex(const Vector2& position)

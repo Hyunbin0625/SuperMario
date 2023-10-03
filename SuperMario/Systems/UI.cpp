@@ -17,7 +17,7 @@ void Ui::Init(UINT currentHp)
 {
 	for (int i = 0; i < 3; ++i)
 	{
-		hpList[i]->SetPosition(CAMERA->GetPosition() + CENTER + Vector2(-383, 134) + Vector2(0, 19 * i));
+		hpList[i]->SetPosition(CAMERA->GetPosition() + CENTER + Vector2(-383, 134) + (Vector2(0, 18) * 2 * i));
 		hpList[i]->SetScale(Vector2(18, 17) * 2.0f);
 	}
 
