@@ -60,7 +60,7 @@ void Test::Update()
 	else if (enemySet->GetSelectedIndex() == 1)
 		enemyList.push_back(make_shared<Turtle>(CAMERA->GetPosition() + CENTER, 2.0f, 50.0f, 150.0f, 1, Direction::L));
 	else if (enemySet->GetSelectedIndex() == 2)
-		enemyList.push_back(make_shared<Wart>(CAMERA->GetPosition() + CENTER, 2.0f, 40.0f, 50.0f, 4, Direction::L));
+		enemyList.push_back(make_shared<Wart>(CAMERA->GetPosition() + CENTER, 2.0f, 40.0f, 50.0f, 10, Direction::L));
 	// Add Block
 	if (blockSet->GetSelectedIndex() == 0)
 		blockList.push_back(make_shared<Grass_01>(CAMERA->GetPosition() + CENTER, tileMap->GetSpacing()));
@@ -70,9 +70,10 @@ void Test::Update()
 	{
 		for (auto& block : blockList)
 		{
-			block->GetTextureRect()->SetPosition(tileMap->GetTilePos(block->GetState().tlieIndex));
+			block->GetTextureRect()->SetPosition(tileMap->GetTilePos(block->GetState().tlieIndex) + Vector2(tileMap->GetSpacing(), tileMap->GetSpacing()) * 0.5f);
 			block->SetSpacing(tileMap->GetSpacing());
 		}
+		tileMap->SetIsRegenerate(false);
 	}
 
 	if (bMod)
@@ -195,6 +196,18 @@ void Test::PostRender()
 	}
 }
 
+void Test::SaveTileMap(const wstring& path)
+{
+
+
+}
+
+void Test::LoadTileMap(const wstring& path)
+{
+
+
+}
+
 void Test::Collision()
 {
 	bool bCheck = false;
@@ -272,7 +285,7 @@ void Test::Collision()
 	shared_ptr<IEnemy> Tenemy = nullptr;
 	for (auto& enemy : enemyList)
 	{
-		if (enemy->GetIsThrow())
+		if (enemy->GetIsThrow() && enemy->GetHp() > 0)
 		{
 			Tenemy = enemy;
 			break;

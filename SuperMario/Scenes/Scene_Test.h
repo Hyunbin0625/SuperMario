@@ -11,6 +11,9 @@ public:
 	void Render() override;
 	void PostRender() override;
 
+	void SaveTileMap(const wstring& path = L"");
+	void LoadTileMap(const wstring& path = L"");
+
 public:
 	void Collision();
 
@@ -27,7 +30,6 @@ private:
 
 	vector<shared_ptr<IBlock>> blockList;
 	unique_ptr<BlockSet> blockSet;
-
 
 	bool bMod = true;
 };

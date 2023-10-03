@@ -36,8 +36,9 @@ public:
 	Vector2 GetTilePos(const Vector2& tileIndex) { return tiles[tileIndex.x][tileIndex.y].pos; }
 	Vector2 GetTileMapScale() { return (Vector2(width, height) * spacing); }
 	int GetSpacing() { return (int)spacing; }
-
 	bool GetIsRegenerate() { return bRegenerate; }
+
+	void SetIsRegenerate(bool bRegenerate) { this->bRegenerate = bRegenerate; }
 
 public:
 	vector<shared_ptr<TileCollision>> GetTileCollisions() { return tileCollisions; }
@@ -62,7 +63,7 @@ private:
 	unique_ptr<ColorRect> backGround;
 	Color color = Color();
 
-	bool bCollision = false;
+	bool bCollision = true;
 	bool bView = true;
 	bool bRegenerate = false;
 };

@@ -418,10 +418,10 @@ void Player::GUI()
 		string textHp = "Player Hp : " + to_string(hp);
 		ImGui::Text(textHp.c_str());
 		if (ImGui::Button("Down", ImVec2(50, 30)))
-			--hp;
+			--maxHp;
 		ImGui::SameLine();
 		if (ImGui::Button("Up", ImVec2(50, 30)))
-			++hp;
+			++maxHp;
 
 		ImGui::EndTabItem();
 	}

@@ -30,7 +30,7 @@ public:
 	virtual EnemyState GetState() override { return state; }
 	virtual bool GetIsThrow() override { return false; }
 
-	virtual void SetHit(bool hit, Vector2 hitPos) override { hp -= hit; this->hitPos = hitPos; }
+	virtual void SetHit(bool hit, Vector2 hitPos) override { hp -= hit; }
 	virtual void SetGroundPos(Vector2 groundPos) override { this->groundPos = groundPos; }
 	virtual void SetIsMod(bool bMod) override  { this->bMod = bMod; }
 
@@ -54,7 +54,6 @@ private:
 	Vector2 groundPos = Vector2(-1000, -1000);
 	bool bGround = false;
 
-	Vector2 hitPos = Vector2();
 	float speed = 0.0f;
 
 	float vel = 0.0f;
