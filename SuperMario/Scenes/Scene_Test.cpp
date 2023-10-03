@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "Scene_Test.h"
 
-int world_current = 0;
-
 void Test::Init()
 {
 	world_current = 0;
@@ -67,7 +65,7 @@ void Test::Update()
 	else if (enemySet->GetSelectedIndex() == 1)
 		enemyList.push_back(make_shared<Turtle>(CAMERA->GetPosition() + CENTER, 2.0f, 50.0f, 150.0f, 1, Direction::L));
 	else if (enemySet->GetSelectedIndex() == 2)
-		enemyList.push_back(make_shared<Wart>(CAMERA->GetPosition() + CENTER, 2.0f, 40.0f, 50.0f, 10, Direction::L));
+		enemyList.push_back(make_shared<Wart>(CAMERA->GetPosition() + CENTER, 2.0f, 40.0f, 50.0f, 4, Direction::L));
 	// Add Block
 	if (blockSet->GetSelectedIndex() == 0)
 		blockList.push_back(make_shared<Grass_01>(CAMERA->GetPosition() + CENTER, tileMap->GetSpacing()));
@@ -77,10 +75,9 @@ void Test::Update()
 	{
 		for (auto& block : blockList)
 		{
-			block->GetTextureRect()->SetPosition(tileMap->GetTilePos(block->GetState().tlieIndex) + Vector2(tileMap->GetSpacing(), tileMap->GetSpacing()) * 0.5f);
+			block->GetTextureRect()->SetPosition(tileMap->GetTilePos(block->GetState().tlieIndex));
 			block->SetSpacing(tileMap->GetSpacing());
 		}
-		tileMap->SetIsRegenerate(false);
 	}
 
 	if (bMod)
@@ -112,6 +109,7 @@ void Test::Update()
 					itemList.push_back(make_shared<S_Radish>(block->GetTextureRect()->GetPosition(), 2.0f, true));
 				else if (block->GetItemType() == ItemType::B_Radish)
 					itemList.push_back(make_shared<B_Radish>(block->GetTextureRect()->GetPosition(), 2.0f, true));
+				itemList.back()->SetIsMod(bMod);
 				block->SetIsHolding(false);
 				block->SetIsCheck(false);
 			}
@@ -230,6 +228,7 @@ void Test::PostRender()
 			CAMERA->SetPosition(player->GetPosition() - CENTER);
 		}
 	}
+	
 }
 
 void Test::SaveTileMap(const wstring& path)
@@ -442,7 +441,7 @@ void Test::Collision()
 	shared_ptr<IEnemy> Tenemy = nullptr;
 	for (auto& enemy : enemyList)
 	{
-		if (enemy->GetIsThrow() && enemy->GetHp() > 0)
+		if (enemy->GetIsThrow())
 		{
 			Tenemy = enemy;
 			break;

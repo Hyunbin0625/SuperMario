@@ -31,5 +31,6 @@ private:
 	vector<shared_ptr<IBlock>> blockList;
 	unique_ptr<BlockSet> blockSet;
 
+	int world_current = 0;
 	bool bMod = true;
 };
