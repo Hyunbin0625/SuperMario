@@ -69,8 +69,6 @@ void Test::Update()
 	else if (enemySet->GetSelectedIndex() == 2)
 		enemyList.push_back(make_shared<Wart>(CAMERA->GetPosition() + CENTER, 2.0f, 40.0f, 50.0f, 10, Direction::L));
 	// Add Block
-//	if (blockSet->GetSelectedIndex() == 0)
-//		blockList.push_back(make_shared<Next_Door>(CAMERA->GetPosition() + CENTER, tileMap->GetSpacing()));
 	if (blockSet->GetSelectedIndex() == 0)
 		blockList.push_back(make_shared<Grass_01>(CAMERA->GetPosition() + CENTER, tileMap->GetSpacing()));
 
@@ -359,8 +357,6 @@ void Test::LoadTileMap(const wstring& path)
 
 				Vector2 position = tileMap->GetTilePos(blockState.tlieIndex);
 				float spacing = tileMap->GetSpacing();
-			//	if (blockState.type == BlockType::Next_Door)
-			//		blockList[i] = make_shared<Next_Door>(position, spacing, blockState.tlieIndex, blockState.regen);
 				if (blockState.type == BlockType::Grass_01)
 					blockList[i] = make_shared<Grass_01>(position, spacing, blockState.tlieIndex, blockState.regen);
 			}
