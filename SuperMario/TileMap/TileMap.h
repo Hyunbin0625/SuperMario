@@ -38,6 +38,7 @@ public:
 	int GetSpacing() { return (int)spacing; }
 	bool GetIsRegenerate() { return bRegenerate; }
 
+	void SetIsView(bool bView) { this->bView = bView; }
 	void SetIsRegenerate(bool bRegenerate) { this->bRegenerate = bRegenerate; }
 
 public:

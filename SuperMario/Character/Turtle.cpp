@@ -138,6 +138,7 @@ void Turtle::Update()
 		if (!bDeath)
 			Death();
 		bDeath = true;
+		bThrow = false;
 
 		vel += (float)(G * state.Gdrainage * DELTA);
 		jumpSpeed -= vel * DELTA;

@@ -411,7 +411,7 @@ void Player::GUI()
 		ImGui::SliderFloat2("Position", (float*)&position, CAMERA->GetPosition().x, CAMERA->GetPosition().x + WIN_DEFAULT_WIDTH);
 		ImGui::SliderFloat("Scale", &totalSize, 0.0f, 10.0f);
 		if (ImGui::InputFloat("Speed", &speed, 1.0f, 100.0f))
-			animRect->GET_COMP(Move)->SetSpeed(speed);
+			animRect->GET_COMP(Move)->SetMaxSpeed(speed);
 		ImGui::InputFloat("Jump", &jumpMaxSpeed, 1.0f, 100.0f);
 		ImGui::InputFloat("G_Drainage", &Gdrainage, 1.0f, 100.0f);
 
@@ -457,6 +457,7 @@ void Player::LoadFile(ifstream& in)
 
 	// Speed
 	in.read((char*)&speed, sizeof(speed));
+	animRect->GET_COMP(Move)->SetMaxSpeed(speed);
 
 	//Jump Speed
 	in.read((char*)&jumpMaxSpeed, sizeof(jumpMaxSpeed));

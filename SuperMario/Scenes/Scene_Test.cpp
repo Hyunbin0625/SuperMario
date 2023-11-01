@@ -5,7 +5,7 @@ void Test::Init()
 {
 	world_current = 0;
 
-	tileMap = make_unique<TileMap>(Vector2(), Vector2(WIN_DEFAULT_WIDTH, WIN_DEFAULT_HEIGHT), 0.0f, Color(0.35f, 0.7f, 1.0f, 1.0f), L"_Textures/World1_Block.png", 16, 16);
+	tileMap = make_unique<TileMap>(Vector2(), Vector2(WIN_DEFAULT_WIDTH, WIN_DEFAULT_HEIGHT), 0.0f, Color(0.35f, 0.7f, 1.0f, 1.0f), L"_Textures/World1_Block_n.png", 16, 16);
 
 	player = make_shared<Player>(CENTER, 2.0f);
 
@@ -195,6 +195,7 @@ void Test::PostRender()
 				if (ImGui::Button("Play", ImVec2(50, 30)))
 				{
 					bMod = false;
+					tileMap->SetIsView(false);
 					CAMERA->SetPosition(player->GetPosition() - CENTER);
 				}
 				player->SetIsMod(bMod);
@@ -225,6 +226,7 @@ void Test::PostRender()
 		if (INPUT->Press(VK_ESCAPE))
 		{
 			bMod = true;
+			tileMap->SetIsView(true);
 			CAMERA->SetPosition(player->GetPosition() - CENTER);
 		}
 	}
